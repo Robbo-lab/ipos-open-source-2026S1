@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "task_manager_cli"
+version = "0.2"
+description = "A CLI-based Task Management App with reusable components"
+authors = [
+    { name = "Your Name", email = "your-email@example.com" }
+]
+license = { text = "MIT" }
+keywords = ["task", "management", "cli", "reusable", "components"]
+readme = "README.md"
+requires-python = ">=3.9"
+
+dependencies = [
+    "click>=8.0",
+    "python-dateutil>=2.8"
+]
+
+[project.urls]
+Homepage = "http://github.com/your_username/task-manager-cli"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]

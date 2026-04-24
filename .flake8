@@ -1,0 +1,29 @@
+[flake8]
+# Enforce shorter, more readable lines
+max-line-length = 88
+
+# Forces smaller, cleaner functions
+max-complexity = 7
+
+# Enable strict indentation, whitespace and style issues
+select = C,E,F,W,B,B950
+
+# Ignore nothing
+ignore =
+
+# Require docstrings for modules, classes, and functions
+docstring-convention = google
+
+# Enforce import order and formatting
+import-order-style = google
+
+# Disallow relative imports
+ban-relative-imports = true
+
+# Enforce naming conventions
+extend-select = N
+
+# Limit function complexity structurally
+max-arguments = 5
+max-branches = 8
+max-statements = 25
