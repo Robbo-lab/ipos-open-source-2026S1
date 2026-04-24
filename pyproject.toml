@@ -6,18 +6,13 @@ build-backend = "setuptools.build_meta"
 name = "task_manager_cli"
 version = "0.2"
 description = "A CLI-based Task Management App with reusable components"
-authors = [
-    { name = "Your Name", email = "your-email@example.com" }
-]
+authors = [{ name = "Your Name", email = "your-email@example.com" }]
 license = { text = "MIT" }
 keywords = ["task", "management", "cli", "reusable", "components"]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
-dependencies = [
-    "click>=8.0",
-    "python-dateutil>=2.8"
-]
+dependencies = ["click>=8.0", "python-dateutil>=2.8"]
 
 [project.urls]
 Homepage = "http://github.com/your_username/task-manager-cli"
@@ -27,3 +22,38 @@ package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.ruff]
+line-length = 88
+fix = true
+unsafe-fixes = true
+preview = true
+extend-exclude = [""]
+
+[tool.ruff.lint]
+preview = true
+select = ["C90", "E", "F", "W", "B", "D", "I", "N", "TID", "PLR"]
+ignore = []
+
+[tool.ruff.lint.mccabe]
+max-complexity = 7
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.pylint]
+max-args = 5
+max-branches = 8
+max-statements = 25
+
+[tool.ruff.format]
+quote-style = "double"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+indent-style = "space"
