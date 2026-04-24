@@ -1,3 +1,5 @@
+# Onboarding
+
 ## Table of Contents
 
 1. Introduction
@@ -79,6 +81,7 @@ Follow **GitHub Flow**:
    ```
 
 5. **Push and Open PRs**:
+
    ```bash
    git push -u origin <branch-name>
    ```
@@ -110,9 +113,11 @@ Follow **GitHub Flow**:
 
 - **Python 3.9+** is required.
 - Install dependencies:
+
   ```bash
   pip install -r requirements.txt
   ```
+
 - Recommended tools:
   - IDE: PyCharm or Visual Studio Code.
   - Linter: `flake8` for PEP8 compliance.
@@ -138,7 +143,7 @@ Follow **GitHub Flow**:
 
 ## **11. Project Structure**
 
-```
+```txt
 task-manager-cli/
 │
 ├── src/                       # Source code
@@ -199,8 +204,8 @@ task-manager-cli/
 
 ## **17. Contacts**
 
-- **Lecturer/Reviewer**: Jamie Robertson (jamie.robertson@example.com)
-- **DevOps Admin**: Aarav Patel (aarav.patel@example.com)
+- **Lecturer/Reviewer**: Jamie Robertson (<jamie.robertson@example.com>)
+- **DevOps Admin**: Aarav Patel (<aarav.patel@example.com>)
 
 ---
 
