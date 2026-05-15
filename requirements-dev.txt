@@ -2,25 +2,39 @@
 #    uv pip compile pyproject.toml --group dev -o requirements-dev.txt
 aiofile==3.9.0
     # via py-key-value-aio
+aiohttp==3.7.4.post0
+    # via uvicore
+aioredis==1.3.1
+    # via uvicore
 annotated-doc==0.0.4
     # via fastapi
 annotated-types==0.7.0
     # via pydantic
 anyio==4.13.0
     # via
+    #   asyncclick
     #   httpx
     #   mcp
     #   py-key-value-aio
     #   sse-starlette
     #   starlette
     #   watchfiles
+argon2-cffi==20.1.0
+    # via uvicore
+async-timeout==3.0.1
+    # via
+    #   aiohttp
+    #   aioredis
+asyncclick==7.1.2.3
+    # via uvicore
 attrs==26.1.0
     # via
+    #   aiohttp
     #   cyclopts
     #   flake8-bugbear
     #   jsonschema
     #   referencing
-authlib==1.7.2
+authlib==1.6.12
     # via fastmcp-slim
 beartype==0.22.9
     # via py-key-value-aio
@@ -33,18 +47,26 @@ certifi==2026.4.22
     #   httpcore
     #   httpx
 cffi==2.0.0
-    # via cryptography
+    # via
+    #   argon2-cffi
+    #   cryptography
+chardet==4.0.0
+    # via aiohttp
 click==8.3.3
     # via
     #   ipos-open-source-2026s1 (pyproject.toml)
     #   uvicorn
+colored==1.4.4
+    # via uvicore
+colorful==0.5.8
+    # via prettyprinter
 coverage==7.14.0
     # via pytest-cov
-cryptography==48.0.0
+cryptography==3.4.8
     # via
     #   authlib
-    #   joserfc
     #   pyjwt
+    #   uvicore
 cyclopts==4.12.0
     # via fastmcp-slim
 dnspython==2.8.0
@@ -55,6 +77,8 @@ docutils==0.22.4
     # via rich-rst
 email-validator==2.3.0
     # via pydantic
+environs==9.3.5
+    # via uvicore
 exceptiongroup==1.3.1
     # via fastmcp-slim
 fastapi==0.136.1
@@ -87,6 +111,8 @@ h11==0.16.0
     # via
     #   httpcore
     #   uvicorn
+hiredis==3.3.1
+    # via aioredis
 httpcore==1.0.9
     # via httpx
 httpx==0.28.1
@@ -102,6 +128,7 @@ idna==3.15
     #   anyio
     #   email-validator
     #   httpx
+    #   yarl
 importlib-metadata==8.7.1
     # via opentelemetry-api
 iniconfig==2.3.0
@@ -112,8 +139,6 @@ jaraco-context==6.1.2
     # via keyring
 jaraco-functools==4.4.0
     # via keyring
-joserfc==1.6.5
-    # via authlib
 jsonref==1.1.0
     # via fastmcp-slim
 jsonschema==4.26.0
@@ -126,6 +151,8 @@ keyring==25.7.0
     # via py-key-value-aio
 markdown-it-py==4.2.0
     # via rich
+marshmallow==4.3.0
+    # via environs
 mccabe==0.7.0
     # via flake8
 mcp==1.27.1
@@ -136,6 +163,10 @@ more-itertools==11.0.2
     # via
     #   jaraco-classes
     #   jaraco-functools
+multidict==6.7.1
+    # via
+    #   aiohttp
+    #   yarl
 openapi-pydantic==0.5.1
     # via fastmcp-slim
 opentelemetry-api==1.41.1
@@ -154,6 +185,10 @@ pluggy==1.6.0
     # via
     #   pytest
     #   pytest-cov
+prettyprinter==0.18.0
+    # via uvicore
+propcache==0.5.2
+    # via yarl
 py-key-value-aio==0.4.4
     # via fastmcp-slim
 pycodestyle==2.14.0
@@ -185,6 +220,7 @@ pyflakes==3.4.0
     # via flake8
 pygments==2.20.0
     # via
+    #   prettyprinter
     #   pytest
     #   rich
 pyjwt==2.12.1
@@ -201,6 +237,7 @@ python-dateutil==2.9.0.post0
     # via ipos-open-source-2026s1 (pyproject.toml)
 python-dotenv==1.2.2
     # via
+    #   environs
     #   fastmcp-slim
     #   pydantic-settings
 python-multipart==0.0.28
@@ -232,7 +269,9 @@ ruff==0.15.13
 setuptools==82.0.1
     # via flake8-import-order
 six==1.17.0
-    # via python-dateutil
+    # via
+    #   argon2-cffi
+    #   python-dateutil
 snowballstemmer==3.0.1
     # via pydocstyle
 sortedcontainers==2.4.0
@@ -246,6 +285,7 @@ starlette==1.0.0
     #   sse-starlette
 typing-extensions==4.15.0
     # via
+    #   aiohttp
     #   fastapi
     #   fastmcp-slim
     #   mcp
@@ -262,6 +302,8 @@ typing-inspection==0.4.2
     #   pydantic-settings
 uncalled-for==0.3.2
     # via fastmcp-slim
+uvicore==0.1.14
+    # via ipos-open-source-2026s1 (pyproject.toml)
 uvicorn==0.47.0
     # via
     #   fastmcp-slim
@@ -270,5 +312,7 @@ watchfiles==1.1.1
     # via fastmcp-slim
 websockets==16.0
     # via fastmcp-slim
+yarl==1.23.0
+    # via aiohttp
 zipp==3.23.1
     # via importlib-metadata
