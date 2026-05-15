@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 
-def unit_reference() -> Dict[str, Any]:
+def unit_reference() -> dict[str, Any]:
     """
     JSON cheatsheet of supported conversions, formulas, and sample IO.
 

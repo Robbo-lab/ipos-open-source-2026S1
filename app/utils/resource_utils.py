@@ -1,18 +1,18 @@
 import json
-from typing import Any, Dict, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 from fastmcp import FastMCP
-from fastmcp.resources import TextResource, BinaryResource
+from fastmcp.resources import BinaryResource, TextResource
 
 
 def register_resources(
     mcp: FastMCP,
-    definitions: Iterable[Dict[str, Any]],
+    definitions: Iterable[dict[str, Any]],
     uri_template: str = "resource://converter/{name}",
     include_static: bool = True,
 ) -> None:
     """Register a dynamic resource route that serves all definitions via URI parameters."""
-
     lookup_table = {}
 
     for define in definitions:
@@ -33,8 +33,7 @@ def register_resources(
         # return as_text(content)
         if not isinstance(content, (bytes, bytearray)):
             return as_text(content)
-        else:
-            return content
+        return content
 
     # Dynamic template (with parameters)
     mcp.resource(

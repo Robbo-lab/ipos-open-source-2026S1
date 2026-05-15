@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import List
 
 from fastmcp.prompts import Message
 
@@ -8,9 +7,8 @@ def explain_conversion_prompt(
     input_value: str,
     input_unit: str,
     target_unit: str,
-) -> List[Message]:
+) -> list[Message]:
     """Creates a tutoring-style system + user prompt for unit conversion explanations."""
-
     instructions = (
         "You are a clear, patient, and encouraging tutor helping students learn unit conversions. "
         "Always follow these rules:\n"
