@@ -6,7 +6,11 @@ flake8-import-order
 flake8-docstrings
 flake8-print
 pydocstyle
-fastapi
+uvicorn
 fastmcp
+fastapi 
+fastapi-mcp 
+feedparser
 pydantic
 pytest
+httpx
