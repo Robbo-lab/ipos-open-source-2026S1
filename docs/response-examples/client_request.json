@@ -1,0 +1,14 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "initialize",
+  "params": {
+    "clientInfo": { "name": "my-mcp-client", "version": "1.0.0" },
+    "capabilities": {
+      "tools": true,
+      "resources": true,
+      "prompts": true,
+      "messageContent": ["text", "image", "resource", "tool-result"]
+    }
+  }
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "type": "image",
+    "data": "base64-encoded-image-data",
+    "mimeType": "image/png"
+  },
+  {
+    "type": "audio",
+    "data": "base64-encoded-audio-data",
+    "mimeType": "audio/wav"
+  },
+  {
+    "type": "resource",
+    "resource": {
+      "uri": "resource://example",
+      "mimeType": "text/plain",
+      "text": "Resource content"
+    }
+  }
+]

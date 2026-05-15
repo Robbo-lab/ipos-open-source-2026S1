@@ -1,0 +1,9 @@
+{
+  "jsonrpc": "2.0",
+  "method": "progress",
+  "params": {
+    "id": "op-7842",
+    "phase": "running",
+    "message": "Executing tool: search"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "serverInfo": { "name": "my-mcp-server", "version": "0.3.2" },
+    "capabilities": {
+      "tools": ["search", "summarise"],
+      "resources": ["file", "url"],
+      "prompts": ["diagnose", "explain"]
+    }
+  }
+}
