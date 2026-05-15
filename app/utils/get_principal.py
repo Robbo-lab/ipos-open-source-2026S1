@@ -2,8 +2,9 @@ from fastapi import HTTPException, Header
 from pydantic import BaseModel
 from typing import Optional, Set
 
+
 class Principal(BaseModel):
-    user_id:   str
+    user_id: str
     roles: Set[str] = set()
     scopes: Set[str] = set()
 
@@ -15,9 +16,9 @@ def get_current_principal(
     """
     For de
         accept Bearer tokens like 'Bearer demo-token-<role>'.
-    Parameters: 
+    Parameters:
         authorisation is the Authorization header, expected to be a Bearer token.
-    Returns: 
+    Returns:
         a Principal class object with user_id, roles, and scopes.
     """
     if not authorisation or not authorisation.lower().startswith("bearer "):

@@ -1,4 +1,4 @@
-from conftest import parse_mcp_response
+from tests.mcp.conftest import parse_mcp_response
 
 
 def test_tools_list(mcp_client):

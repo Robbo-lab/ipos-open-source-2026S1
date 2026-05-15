@@ -1,4 +1,4 @@
-from conftest import parse_mcp_response
+from tests.mcp.conftest import parse_mcp_response
 
 
 def test_initialise_server(mcp_url, mcp_headers, http_client, protocol_version):

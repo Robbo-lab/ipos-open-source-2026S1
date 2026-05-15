@@ -32,10 +32,11 @@ def explain_conversion_prompt(
         Message(role="user", content=user_prompt),
     ]
 
+
 # TODO
 def api_usage_prompt():
     pass
- 
+
 
 PROMPT_DEFINITIONS = [
     {
