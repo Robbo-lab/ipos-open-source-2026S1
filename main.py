@@ -1,36 +1,100 @@
-from src.task_manager import add_task, delete_task, list_tasks
-from src.file_handler import load_tasks
+# Unit Converter API + MCP (tools, resources, prompts)
+# Uses FastAPI for HTTP routes and FastMCP to expose tools/resources/prompts over HTTP/SSE transports.
+from fastapi import FastAPI, APIRouter
+from fastmcp import FastMCP
 
+from mcp_tools.miles_to_km import router as mile_to_km
+from mcp_prompts.converter_prompts import explain_conversion_prompt
+from mcp_resources.converter_resources import RESOURCE_DEFINITIONS
 
-def main():
-    tasks = load_tasks()
-    while True:
-        print("\nTask Manager CLI")
-        print("1. Add Task")
-        print("2. Delete Task")
-        print("3. List Tasks")
-        print("4. Exit")
+from utils.resource_utils import register_resources
 
-        choice = input("Enter your choice: ")
-        if choice == "1":
-            title = input("Title: ")
-            description = input("Description: ")
-            due_date = input("Due Date (DD-MM-YYYY): ")
-            add_task(tasks, title, description, due_date)
-        elif choice == "2":
-            title = input("Title of the task to delete: ")
-            if delete_task(tasks, title):
-                print("Task deleted successfully.")
-            else:
-                print("Task not found.")
-        elif choice == "3":
-            list_tasks(tasks)
-        elif choice == "4":
-            print("Exiting Task Manager.")
-            break
-        else:
-            print("Invalid choice. Try again.")
+import platform
+import datetime
+import os
+import time
+from pathlib import Path
+import uvicorn
 
+# FastAPI app for plain HTTP
+app = FastAPI(
+    title="Unit Converter MCP Server",
+    description="FastAPI endpoints auto-exposed as MCP tools via FastMCP, with resources and prompts.",
+    version="1.2.1",
+)
+
+# --- Register Tool ---
+app.include_router(mile_to_km)
+
+# --- Register System ---
+system_router = APIRouter(prefix="", tags=["system"])
+started_at = time.time()
+
+@system_router.get("/")
+def root():
+    return {
+        "service": "unit-converter-mcp-server",
+        "status": "ok",
+        "docs": "/docs",
+        "health": "/health",
+        "mcp": "/mcp/",
+    }
+
+@system_router.get("/health")
+def health():
+    return {
+        "status": "ok",
+        "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
+        "python": platform.python_version(),
+        "platform": platform.platform(),
+        "pid": os.getpid(),
+        "cwd": os.getcwd(),
+        "uptime_seconds": round(time.time() - started_at, 2),
+    }
+
+app.include_router(system_router)
+
+# FastMCP server generated from FastAPI OpenAPI (tools) plus manual resources/prompts
+mcp = FastMCP.from_fastapi(
+    app,
+    name="Unit Converter MCP Server",
+    instructions="Unit conversion tools with supporting resources and prompts.",
+)
+
+# --- Register Resources --- dynamically via URI template
+register_resources(mcp, RESOURCE_DEFINITIONS)
+
+# Prompts
+@mcp.prompt(name="explain_conversion", description="Guide a learner through the math for a conversion.")
+def _prompt_explain_conversion(input_value: str, input_unit: str, target_unit: str):
+    return explain_conversion_prompt(
+        input_value=input_value,
+        input_unit=input_unit,
+        target_unit=target_unit,
+    )
+
+# Build MCP sub-application and mount onto FastAPI
+mcp_http_app = mcp.http_app(path="/", transport="streamable-http")
+
+# Ensure FastAPI runs the MCP lifespan so streamable-http initialises properly
+app.router.lifespan_context = mcp_http_app.lifespan
+
+app.mount("/mcp", mcp_http_app)
 
 if __name__ == "__main__":
-    main()
+    import uvicorn
+
+    PORT = 8003
+
+    print("Starting the Unit Converter API server (HTTP + MCP tools/resources/prompts)...")
+    print(f"HTTP docs:      http://localhost:{PORT}/docs")
+    print(f"HTTP redoc:     http://localhost:{PORT}/redoc")
+    print(f"MCP endpoint:   http://localhost:{PORT}/mcp (HTTP)")
+
+    uvicorn.run(
+        app,
+        host="localhost",
+        port=PORT,
+        log_level="trace",   # Uvicorn internal logging
+        log_config=LOG_CONFIG,
+    )
