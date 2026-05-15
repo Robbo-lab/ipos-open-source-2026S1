@@ -98,10 +98,10 @@ Only the Service Layer is allowed to talk to storage.
 The folder layout matches the architecture above.
 
 ```text
-converter-mcp-app/
+task-mcp-app/
 ├── README.md
 ├── requirements.txt
-├── app/
+├── src/
 │   ├── main.py
 │   ├── core/
 │   ├── models/
@@ -111,7 +111,7 @@ converter-mcp-app/
 │   ├── data/
 │   ├── utils/
 │   ├── observers/
-│   └── tests/
+│── tests/
 ├── docs/
 └── scripts/
 ```

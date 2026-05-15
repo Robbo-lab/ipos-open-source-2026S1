@@ -8,7 +8,7 @@ from typing import Any
 from dotenv import load_dotenv
 from fastmcp import Client
 
-from mcp_prompts.converter_prompts import explain_conversion_prompt
+from app.mcp.mcp_prompts.converter_prompts import explain_conversion_prompt
 
 load_dotenv()
 
