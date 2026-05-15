@@ -1,0 +1,161 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Unit Converter API Tutorial",
+    "description": "FastAPI endpoints auto-exposed as MCP tools via FastMCP, with resources and prompts.",
+    "version": "1.2.1"
+  },
+  "paths": {
+    "/celsius-to-fahrenheit": {
+      "post": {
+        "tags": ["unit-conversion"],
+        "summary": "Celsius To Fahrenheit",
+        "description": "HTTP endpoint: convert Celsius to Fahrenheit.\n\nArgs:\n    celsius: Temperature in Celsius.\n\nReturns:\n    JSON dict with the result and operation name.",
+        "operationId": "celsius_to_fahrenheit_celsius_to_fahrenheit_post",
+        "parameters": [
+          {
+            "name": "celsius",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "number", "title": "Celsius" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fahrenheit-to-celsius": {
+      "post": {
+        "tags": ["unit-conversion"],
+        "summary": "Fahrenheit To Celsius",
+        "description": "HTTP endpoint: convert Fahrenheit to Celsius.\n\nArgs:\n    fahrenheit: Temperature in Fahrenheit.\n\nReturns:\n    JSON dict with the result and operation name.",
+        "operationId": "fahrenheit_to_celsius_fahrenheit_to_celsius_post",
+        "parameters": [
+          {
+            "name": "fahrenheit",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "number", "title": "Fahrenheit" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/kilometers-to-miles": {
+      "post": {
+        "tags": ["unit-conversion"],
+        "summary": "Kilometers To Miles",
+        "description": "HTTP endpoint: convert kilometers to miles.\n\nArgs:\n    kilometers: Distance in kilometers.\n\nReturns:\n    JSON dict with the result and operation name.",
+        "operationId": "kilometers_to_miles_kilometers_to_miles_post",
+        "parameters": [
+          {
+            "name": "kilometers",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "number", "title": "Kilometers" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/miles-to-kilometers": {
+      "post": {
+        "tags": ["unit-conversion"],
+        "summary": "Miles To Kilometers",
+        "description": "HTTP endpoint: convert miles to kilometers with input validation.\n\nArgs:\n    miles: Distance in miles.\n\nReturns:\n    JSON dict with the result and operation name, or an error message.",
+        "operationId": "miles_to_kilometers_miles_to_kilometers_post",
+        "parameters": [
+          {
+            "name": "miles",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "number", "title": "Miles" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": { "$ref": "#/components/schemas/ValidationError" },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": { "type": "string", "title": "Message" },
+          "type": { "type": "string", "title": "Error Type" },
+          "input": { "title": "Input" },
+          "ctx": { "type": "object", "title": "Context" }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

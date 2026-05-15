@@ -93,6 +93,7 @@ ignore = [
   "T20", # ignore: flake8-print (keep prints for now)
   "PT", # ignore: flake8-pytest-style (keep unittest-style asserts if needed)
   "COM812", # ignore: trailing comma conflict with formatter
+  "E501", # ignore: line too long for docstring's
 ]
 
 [tool.ruff.lint.mccabe]

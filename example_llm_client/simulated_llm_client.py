@@ -2,13 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import os
-import time
-from typing import Any
 
 from dotenv import load_dotenv
-from fastmcp import Client
-
-from mcp_prompts.converter_prompts import explain_conversion_prompt
 
 load_dotenv()
 
@@ -35,7 +30,6 @@ async def call_mcp_tool():
     The calculation happens on the MCP server. This client only orchestrates the
     request/response flow and forwards the structured tool result to Gemini.
     """
-
     pass
 
 
@@ -51,10 +45,8 @@ def build_gemini_prompt():
     pass
 
 
-def generate_ll_explanation(
-) -> str:
+def generate_ll_explanation() -> str:
     """Check fro streamable content from LLM output and return the combined explanation text."""
-
     pass
 
 

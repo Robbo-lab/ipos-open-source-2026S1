@@ -1,0 +1,14 @@
+{
+  "jsonrpc": "2.0",
+  "id": 5,
+  "result": {
+    "resources": [
+      {
+        "name": "Unit Converter Cheatsheet",
+        "uri": "resource://unit_reference",
+        "mimeType": "application/json",
+        "_meta": { "_fastmcp": { "tags": [] } }
+      }
+    ]
+  }
+}

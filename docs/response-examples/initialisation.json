@@ -1,0 +1,26 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "protocolVersion": "2025-06-18",
+    "capabilities": {
+      "logging": {},
+      "prompts": {
+        "listChanged": true
+      },
+      "resources": {
+        "subscribe": true,
+        "listChanged": true
+      },
+      "tools": {
+        "listChanged": true
+      }
+    },
+    "serverInfo": {
+      "name": "ExampleServer",
+      "title": "Example Server Display Name",
+      "version": "1.0.0"
+    },
+    "instructions": "Optional instructions for the client"
+  }
+}

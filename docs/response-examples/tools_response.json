@@ -1,0 +1,18 @@
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "tools": [
+      {
+        "name": "miles_to_kilometers_miles_to_kilometers_post",
+        "description": "HTTP endpoint: convert miles to kilometers with input validation.\n\nArgs:\n    miles: Distance in miles.\n\nReturns:\n    JSON dict with the result and operation name, or an error message.",
+        "inputSchema": {
+          "type": "object",
+          "properties": { "miles": { "type": "number", "title": "Miles" } },
+          "required": ["miles"]
+        },
+        "_meta": { "_fastmcp": { "tags": ["unit-conversion"] } }
+      }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "method": "prompts/get",
+  "params": {
+    "name": "explain_conversion",
+    "arguments": {
+      "input_value": "3",
+      "input_unit": "5",
+      "target_unit": "miles"
+    },
+    "_meta": { "progressToken": 2 }
+  },
+  "jsonrpc": "2.0",
+  "id": 2
+}

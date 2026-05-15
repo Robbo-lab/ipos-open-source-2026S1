@@ -1,0 +1,50 @@
+[
+  {
+    "jsonrpc": "2.0",
+    "id": 5,
+    "result": {
+      "prompts": [
+        {
+          "name": "explain_conversion",
+          "description": "Guide a learner through the math for a conversion.",
+          "arguments": [],
+          "_meta": { "_fastmcp": { "tags": [] } }
+        },
+        {
+          "name": "api_usage",
+          "description": "Produce a curl example for a conversion endpoint.",
+          "arguments": [],
+          "_meta": { "_fastmcp": { "tags": [] } }
+        }
+      ]
+    }
+  },
+  {
+    "response": {
+      "event": "message",
+      "data": {
+        "jsonrpc": "2.0",
+        "id": 10,
+        "result": {
+          "description": "Produce a curl example for a conversion endpoint.",
+          "messages": [
+            {
+              "role": "user",
+              "content": {
+                "type": "text",
+                "text": "{\"role\":\"system\",\"content\":\"You write concise API usage snippets. Show a single curl example that calls the correct endpoint on http://localhost:8002. Include JSON body and a short explanation line.\"}"
+              }
+            },
+            {
+              "role": "user",
+              "content": {
+                "type": "text",
+                "text": "{\"role\":\"user\",\"content\":\"Give me a curl example for the {operation} endpoint.\"}"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+]
