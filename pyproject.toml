@@ -30,11 +30,9 @@ dev = ["hypothesis>=6.152.7", "pytest>=9.0.3", "pytest-cov>=7.1.0", "ruff>=0.15.
 [project.urls]
 Homepage = "https://github.com/Robbo-lab/ipos-open-source-2026S1.git"
 
-[tool.setuptools]
-package-dir = { "" = "src" }
-
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
+include = ["app*"]
 
 [tool.ruff]
 line-length = 88

@@ -9,7 +9,10 @@ import uvicorn
 from fastapi import APIRouter, FastAPI
 from fastmcp import FastMCP
 
-from app.mcp.mcp_prompts.converter_prompts import explain_conversion_prompt
+from app.mcp.mcp_prompts.converter_prompts import (
+    api_usage_prompt,
+    explain_conversion_prompt,
+)
 from app.mcp.mcp_resources.converter_resources import RESOURCE_DEFINITIONS
 from app.mcp.mcp_tools.miles_to_km import router as mile_to_km
 from app.utils.resource_utils import register_resources
@@ -77,6 +80,14 @@ def _prompt_explain_conversion(input_value: str, input_unit: str, target_unit: s
         input_unit=input_unit,
         target_unit=target_unit,
     )
+
+
+@mcp.prompt(
+    name="api_usage",
+    description="Generate a concise API usage example from API reference text.",
+)
+def _prompt_api_usage(operation: str, resource_text: str):
+    return api_usage_prompt(operation=operation, resource_text=resource_text)
 
 
 # Build MCP sub-application and mount onto FastAPI

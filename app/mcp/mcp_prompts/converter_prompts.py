@@ -31,9 +31,22 @@ def explain_conversion_prompt(
     ]
 
 
-# TODO
-def api_usage_prompt():
-    pass
+def api_usage_prompt(operation: str, resource_text: str) -> list[Message]:
+    instructions = (
+        "You write concise API usage snippets. "
+        "Choose the endpoint that best matches the requested operation, "
+        "show one curl example, and add one short explanation line."
+    )
+    user_prompt = (
+        f"Operation: {operation}\n\n"
+        f"Available API reference:\n{resource_text}\n\n"
+        "Return a concise usage example."
+    )
+
+    return [
+        Message(role="assistant", content=instructions),
+        Message(role="user", content=user_prompt),
+    ]
 
 
 PROMPT_DEFINITIONS = [
@@ -41,5 +54,10 @@ PROMPT_DEFINITIONS = [
         "name": "explain_conversion",
         "description": "Guide a learner through the math for a specific conversion.",
         "func": explain_conversion_prompt,
+    },
+    {
+        "name": "api_usage",
+        "description": "Generate a concise API usage example from the provided reference text.",
+        "func": api_usage_prompt,
     },
 ]
