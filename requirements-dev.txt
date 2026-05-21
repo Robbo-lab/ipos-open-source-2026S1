@@ -239,3 +239,6 @@ websockets==16.0
     # via fastmcp-slim
 zipp==3.23.1
     # via importlib-metadata
+
+pandas
+numpy
