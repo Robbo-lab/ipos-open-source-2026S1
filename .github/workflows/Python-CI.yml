@@ -53,6 +53,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements-dev.txt
+      - name: Start MCP server
+        run: |
+          python main.py > server.log 2>&1 &
+          echo $! > server.pid
+          sleep 5
       - name: Run pytest with coverage
         run: |
           pytest --cov=app --cov-report=xml
