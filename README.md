@@ -34,17 +34,16 @@ uv sync
 ```bash
 # start the server
 
-# with Python(reommended)
-python -m main
+# with CPython
+python3.14 -m main
 
-# with UV (install in work in progress)
+# with UV (recommended)
 uv run main.py
 
 # with just
 just run
 
 ```
-**To run test curl commands see doc/curl_testing/mcp_curl_testing_examples**
 
 You’ll see:
 
@@ -54,6 +53,33 @@ You’ll see:
 MCP endpoints served by FastMCP:
 
 - streamable-http: http://localhost:8003/mcp
+- SSE: http://localhost:8003/sse
+
+⸻
+
+## Try the HTTP endpoints (curl)
+Using Mac:
+```bash
+curl -X POST "http://localhost:8003/miles-to-kilometers?miles=3.1" \
+ -H "Authorization: Bearer 143f4a46d74fee0d7918b2857577868cb3daf9e6e50ee91c2f7975ba26fdb8f7"
+
+# If we use pydantic models
+curl -X POST "http://localhost:8003/miles-to-kilometers" \
+ -H "Content-Type: application/json" \
+ -H "Authorization: Bearer Y658139cf61948208ed76a4b36122b9552ec5c3f6da5e02f7c5d85d995dede17dE" \
+ -d "3.1"
+```
+Using Windows:
+```bash
+curl -X POST "http://localhost:8003/miles-to-kilometers?miles=3.1" ^
+ -H "Authorization: Bearer 143f4a46d74fee0d7918b2857577868cb3daf9e6e50ee91c2f7975ba26fdb8f7"
+
+rem If we use pydantic models
+curl -X POST "http://localhost:8003/miles-to-kilometers" ^
+ -H "Content-Type: application/json" ^
+ -H "Authorization: Bearer Y658139cf61948208ed76a4b36122b9552ec5c3f6da5e02f7c5d85d995dede17dE" ^
+ -d "3.1"
+```
 
 Each endpoint returns JSON like:
 
@@ -103,6 +129,63 @@ npx @modelcontextprotocol/inspector@latest -e DUMMY=1 --url http://localhost:800
 
 ```
 
+## JSON-RPC Examples for Prompts & Resources
+(On Windows, paste those into a text editor and replace all `\` with `^`)
+
+1. List all prompts
+
+```bash
+curl -s -X POST <SERVER_URL> \
+-H "Content-Type: application/json" \
+-d '{"jsonrpc":"2.0","method":"prompts/list","params":{},"id":1}'
+```
+
+⸻
+
+2. Get a specific prompt
+
+```bash
+curl -s -X POST <SERVER_URL> \
+-H "Content-Type: application/json" \
+-d '{"jsonrpc":"2.0","method":"prompts/get","params":{"name":"summarize"},"id":2}'
+```
+
+⸻
+
+3. Render/execute a prompt with variables
+
+```bash
+curl -s -X POST <SERVER_URL> \
+-H "Content-Type: application/json" \
+-d '{"jsonrpc":"2.0","method":"prompts/render","params":{"name":"summarize","variables":{"text":"This is the content to summarize","tone":"neutral"}},"id":3}'
+```
+
+4. List available resources
+
+```bash
+curl -s -X POST <SERVER_URL> \
+-H "Content-Type: application/json" \
+-d '{"jsonrpc":"2.0","method":"resources/list","params":{},"id":4}'
+```
+
+5. Read a resource by URI
+
+```bash
+curl -s -X POST <SERVER_URL> \
+-H "Content-Type: application/json" \
+-d '{"jsonrpc":"2.0","method":"resources/read","params":{"uri":"file:///data/report.pdf"},"id":5}'
+```
+
+6. Search resources (if supported)
+
+```bash
+curl -s -X POST <SERVER_URL> \
+-H "Content-Type: application/json" \
+-d '{"jsonrpc":"2.0","method":"resources/search","params":{"query":"error OR exception","limit":50},"id":6}'
+```
+
+⸻
+
 ## Handling errors
 
 - Parse error (-32700)
@@ -113,19 +196,17 @@ npx @modelcontextprotocol/inspector@latest -e DUMMY=1 --url http://localhost:800
 
 ## Notes
 
-**To run test curl commands see doc/curl_testing/mcp_curl_testing_examples**
-
 macOS/Linux (bash/zsh)
 • The examples above will work as-is.
 
 ```bash
 # Windows PowerShell
-curl -Method POST http://localhost:8003/mcp/ `  -Headers @{ "Content-Type"="application/json" }`
+curl -Method POST <SERVER_URL> `  -Headers @{ "Content-Type"="application/json" }`
 -Body '{"jsonrpc":"2.0","method":"prompts/list","params":{},"id":1}'
 ```
 
 Windows CMD
 
 ```bash
-curl -s -X POST http://localhost:8003/mcp/ -H "Content-Type: application/json" -d "{\"jsonrpc\":\"2.0\",\"method\":\"prompts/list\",\"params\":{},\"id\":1}"
+curl -s -X POST <SERVER_URL> -H "Content-Type: application/json" -d "{\"jsonrpc\":\"2.0\",\"method\":\"prompts/list\",\"params\":{},\"id\":1}"
 ```

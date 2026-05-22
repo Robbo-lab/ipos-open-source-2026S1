@@ -53,7 +53,7 @@ curl -s "$MCP" -H "Content-Type: application/json" -H "$ACCEPT" -H "$PROTO" -H "
 - Call `miles_to_kilometers` (shows validation if negative)
 
 ```bash
-curl -s "$MCP" -H "Content-Type: application/json" -H "$ACCEPT" -H "$PROTO" -H "Mcp-Session-Id: $SESSION" -d '{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"miles_to_kilometers_miles_to_kilometers_post","arguments":{"miles":3.1}}}'
+curl -s "$MCP" -H "Content-Type: application/json" -H "$ACCEPT" -H "$PROTO" -H "Mcp-Session-Id: $SESSION" -d '{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"miles_to_kilometers","arguments":{"miles":3.1}}}'
 ```
 
 ## 3. Resources
@@ -121,7 +121,7 @@ Each command returns JSON (tools/resources/prompts over MCP) or plain text/JSON 
 - If you’re on Windows PowerShell, replace single quotes with double quotes and escape inner quotes.
 
 ```bash
-curl -s "$MCP" -H "Content-Type: application/json" -H "$ACCEPT" -H "$PROTO" -H "Mcp-Session-Id: $SESSION" -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name": "miles_to_kilometers_miles_to_kilometers_post","arguments":{"distance":25}}}'
+curl -s "$MCP" -H "Content-Type: application/json" -H "$ACCEPT" -H "$PROTO" -H "Mcp-Session-Id: $SESSION" -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name": "cmiles_to_km_miles_to_km_post","arguments":{"distance":25}}}'
 ```
 
 ```json
@@ -134,7 +134,7 @@ curl -s "$MCP" -H "Content-Type: application/json" -H "$ACCEPT" -H "$PROTO" -H "
       "content": [
         {
           "type": "text",
-          "text": "Unknown tool: 'miles_to_kilometers_miles_to_kilometers_post'"
+          "text": "Unknown tool: 'miles_to_km_miles_to_km_post'"
         }
       ],
       "isError": true
