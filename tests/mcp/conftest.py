@@ -65,6 +65,38 @@ class MCPTestClient:
         return self.client.post(self.url, json=payload, headers=self.headers)
 
 
+def build_mcp_test_client(
+    http_client: httpx.Client,
+    url: str,
+    headers: dict[str, str] | None = None,
+    protocol_version: str = "2025-06-18",
+    client_name: str = "pytest",
+    client_version: str = "1.0",
+) -> MCPTestClient:
+    if headers is None:
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json, text/event-stream",
+            "MCP-Protocol-Version": protocol_version,
+        }
+
+    client = MCPTestClient(http_client, url, headers)
+
+    init_response = client.rpc(
+        "initialize",
+        {
+            "protocolVersion": protocol_version,
+            "capabilities": {},
+            "clientInfo": {"name": client_name, "version": client_version},
+        },
+        rpc_id=0,
+    )
+    assert init_response.status_code in {200, 202}
+
+    client.notification("notifications/initialized")
+    return client
+
+
 def parse_mcp_response(response: httpx.Response) -> dict:
     content_type = response.headers.get("content-type", "")
     if "text/event-stream" not in content_type:
@@ -79,18 +111,9 @@ def parse_mcp_response(response: httpx.Response) -> dict:
 
 @pytest.fixture
 def mcp_client(http_client, mcp_url, mcp_headers, protocol_version):
-    client = MCPTestClient(http_client, mcp_url, mcp_headers)
-
-    init_response = client.rpc(
-        "initialize",
-        {
-            "protocolVersion": protocol_version,
-            "capabilities": {},
-            "clientInfo": {"name": "pytest", "version": "1.0"},
-        },
-        rpc_id=0,
+    return build_mcp_test_client(
+        http_client,
+        mcp_url,
+        headers=mcp_headers,
+        protocol_version=protocol_version,
     )
-    assert init_response.status_code in {200, 202}
-
-    client.notification("notifications/initialized")
-    return client

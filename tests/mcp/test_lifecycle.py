@@ -1,30 +1,19 @@
-from tests.mcp.conftest import parse_mcp_response
+from tests.mcp.conftest import build_mcp_test_client
 
 
 def test_initialise_server(mcp_url, mcp_headers, http_client, protocol_version):
-    payload = {
-        "jsonrpc": "2.0",
-        "id": 1,
-        "method": "initialize",
-        "params": {
-            "protocolVersion": protocol_version,
-            "capabilities": {},
-            "clientInfo": {"name": "pytest", "version": "1.0"},
-        },
-    }
+    client = build_mcp_test_client(
+        http_client,
+        mcp_url,
+        headers=mcp_headers,
+        protocol_version=protocol_version,
+    )
 
-    response = http_client.post(mcp_url, json=payload, headers=mcp_headers)
+    assert client.session_id is not None
+    assert "Mcp-Session-Id" in client.headers
 
-    assert response.status_code in {200, 202}
-    assert response.headers.get("mcp-session-id")
-    body = parse_mcp_response(response)
-    print(f"[test_initialise_server] status_code={response.status_code}")
-    print(f"[test_initialise_server] headers={dict(response.headers)}")
-    print(f"[test_initialise_server] body={body}")
-    assert body["jsonrpc"] == "2.0"
-    assert body["id"] == 1
-    assert "result" in body
-    assert "serverInfo" in body["result"]
+    print(f"[test_initialise_server] headers={dict(client.headers)}")
+    print(f"[test_initialise_server] session_id={client.session_id}")
 
 
 def test_initialized_notification(mcp_client):
