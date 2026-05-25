@@ -13,6 +13,7 @@ from app.mcp.mcp_prompts.converter_prompts import explain_conversion_prompt
 from app.mcp.mcp_resources.converter_resources import RESOURCE_DEFINITIONS
 from app.mcp.mcp_tools.miles_to_km import router as mile_to_km
 from app.utils.resource_utils import register_resources
+from app.utils.response_helpers import build_success_response
 
 # FastAPI app for plain HTTP
 app = FastAPI(
@@ -31,26 +32,28 @@ started_at = time.time()
 
 @system_router.get("/")
 def root():
-    return {
-        "service": "unit-converter-mcp-server",
-        "status": "ok",
-        "docs": "/docs",
-        "health": "/health",
-        "mcp": "/mcp/",
-    }
+    return build_success_response(
+        {
+            "service": "unit-converter-mcp-server",
+            "docs": "/docs",
+            "health": "/health",
+            "mcp": "/mcp/",
+        }
+    )
 
 
 @system_router.get("/health")
 def health():
-    return {
-        "status": "ok",
-        "timestamp": datetime.datetime.now(datetime.UTC).isoformat() + "Z",
-        "python": platform.python_version(),
-        "platform": platform.platform(),
-        "pid": os.getpid(),
-        "cwd": os.getcwd(),
-        "uptime_seconds": round(time.time() - started_at, 2),
-    }
+    return build_success_response(
+        {
+            "timestamp": datetime.datetime.now(datetime.UTC).isoformat() + "Z",
+            "python": platform.python_version(),
+            "platform": platform.platform(),
+            "pid": os.getpid(),
+            "cwd": os.getcwd(),
+            "uptime_seconds": round(time.time() - started_at, 2),
+        }
+    )
 
 
 app.include_router(system_router)

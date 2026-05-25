@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.utils.response_helpers import build_success_response
+
 
 def unit_reference() -> dict[str, Any]:
     """
@@ -12,21 +14,23 @@ def unit_reference() -> dict[str, Any]:
     Returns:
         Dictionary describing conversions, formulas, and examples.
     """
-    return {
-        "id": "unit-converter-cheatsheet",
-        "title": "Unit Converter Cheatsheet",
-        "supported": {
-            "distance": {
-                "miles_to_kilometers": {
-                    "formula": "mi ÷ 0.621371",
-                    "example": {"input": 3.1, "output": 4.98895},
+    return build_success_response(
+        {
+            "id": "unit-converter-cheatsheet",
+            "title": "Unit Converter Cheatsheet",
+            "supported": {
+                "distance": {
+                    "miles_to_kilometers": {
+                        "formula": "mi ÷ 0.621371",
+                        "example": {"input": 3.1, "output": 4.98895},
+                    },
                 },
             },
-        },
-        "notes": [
-            "Negative distances are rejected to keep results meaningful.",
-        ],
-    }
+            "notes": [
+                "Negative distances are rejected to keep results meaningful.",
+            ],
+        }
+    )
 
 
 # How would we scope this?
