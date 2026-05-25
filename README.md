@@ -44,7 +44,7 @@ uv run main.py
 just run
 
 ```
-**To run test curl commands see doc/curl_testing/mcp_curl_testing_examples**
+**To run test curl commands see app/docs/curl_testing/mcp_curl_testing_examples.md**
 
 You’ll see:
 
@@ -113,7 +113,7 @@ npx @modelcontextprotocol/inspector@latest -e DUMMY=1 --url http://localhost:800
 
 ## Notes
 
-**To run test curl commands see doc/curl_testing/mcp_curl_testing_examples**
+**To run test curl commands see app/docs/curl_testing/mcp_curl_testing_examples.md**
 
 macOS/Linux (bash/zsh)
 • The examples above will work as-is.
