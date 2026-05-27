@@ -1,6 +1,6 @@
 # Converter API + MCP
 
-- builds the FastAPI app, wraps it with FastMCP, mounts MCP HTTP endpoints, registers resources and prompts, and starts uvicorn.
+- builds the FastAPI app, wraps it with FastMCP, mounts MCP HTTP/SSE endpoints, registers resources and prompts, and starts uvicorn.
 - requirements.txt - Python dependencies.
 
 ## System Architecture
@@ -78,10 +78,10 @@ The `.env` file is ignored by git, so your API key should stay local and should 
 ```bash
 # start the server
 
-# with Python (recommended)
+# with Python 
 python -m main
 
-# with UV (install in work in progress)
+# with UV (recommended)
 uv run main.py
 
 # with just
@@ -230,3 +230,40 @@ Windows CMD
 ```bash
 curl -s -X POST http://localhost:8003/mcp/ -H "Content-Type: application/json" -d "{\"jsonrpc\":\"2.0\",\"method\":\"prompts/list\",\"params\":{},\"id\":1}"
 ```
+
+---
+
+## Tool Installation Notes
+
+### Just Command Runner (Recommended)
+
+This project uses `just` to simplify common tasks like running the server and tests.
+
+### Recommended Installation
+
+```bash
+# Using UV (Any platform)
+uv tool install rust-just
+```
+
+#### Windows
+
+```powershell
+# Using WinGet (Native)
+winget install --id Casey.Just --exact
+
+# Using Scoop
+scoop install just
+
+# Using Chocolatey
+choco install just
+```
+
+#### macOS
+
+```bash
+# Using Homebrew (macOS)
+brew install just
+```
+
+Once installed, simply run `just` in your terminal to see all available commands.
