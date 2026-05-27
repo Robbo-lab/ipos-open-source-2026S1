@@ -3,6 +3,7 @@ import time
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
+from app.mcp.mcp_tools.conversion import miles_to_kilometers_converter
 
 router = APIRouter(prefix="", tags=["unit-conversion"])
 
@@ -63,9 +64,6 @@ def miles_to_kilometers_value(miles: float) -> float:
 
     return miles_to_kilometers_converter(miles)
 
-# temp fix, will move to its own file in the next commit
-def miles_to_kilometers_converter(miles: float) -> float:
-    return miles /  0.621371
 
 @router.post("/miles-to-kilometers")
 # def miles_to_kilometers(miles: float):
