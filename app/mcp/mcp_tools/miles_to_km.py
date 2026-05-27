@@ -61,8 +61,11 @@ def miles_to_kilometers_value(miles: float) -> float:
             detail="Distance is unrealistically large for this tutorial example.",
         )
 
-    return miles / 0.621371
+    return miles_to_kilometers_converter(miles)
 
+# temp fix, will move to its own file in the next commit
+def miles_to_kilometers_converter(miles: float) -> float:
+    return miles /  0.621371
 
 @router.post("/miles-to-kilometers")
 # def miles_to_kilometers(miles: float):
