@@ -6,7 +6,13 @@ from collections.abc import AsyncGenerator
 import httpx
 from httpx_sse import aconnect_sse
 
-from app.llm.base import BaseLLMClient, LLMProviderError, LLMRequest, LLMResponse
+from app.llm.base import (
+    BaseLLMClient,
+    LLMProviderError,
+    LLMRequest,
+    LLMResponse,
+    StreamingLLMClient,
+)
 from app.llm.providers.gemini.models import (
     Content,
     GenerateContentRequest,
@@ -17,7 +23,7 @@ from app.llm.providers.gemini.models import (
 )
 
 
-class GeminiClient(BaseLLMClient):
+class GeminiClient(StreamingLLMClient, BaseLLMClient):
     """An asynchronous client for the Gemini API, implementing the BaseLLMClient interface."""
 
     def __init__(
