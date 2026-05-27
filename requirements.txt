@@ -8,6 +8,7 @@ annotated-types==0.7.0
     # via pydantic
 anyio==4.13.0
     # via
+    #   ipos-open-source-2026s1 (pyproject.toml)
     #   httpx
     #   mcp
     #   py-key-value-aio
