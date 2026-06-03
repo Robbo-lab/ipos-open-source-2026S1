@@ -12,10 +12,10 @@ MAX_TUTORIAL_MILES = 100_000
 # --- Request/Response models for clarity ---
 class MilestoKmRequest(BaseModel):
     """Request model for miles to kilometers conversion, with validation.
-    Attributes: ge=0 ensures non-negative input, and description provides API documentation.
+    Attributes: ge=1 ensures non-negative input, and description provides API documentation.
     """
 
-    miles: float = Field(..., ge=0, description="Distance in miles (>= 0)")
+    miles: float = Field(..., ge=1, description="Distance in miles (>= 0)")
 
 
 class MilestoKmResponse(BaseModel):
