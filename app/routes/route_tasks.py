@@ -27,8 +27,8 @@ def get_task_by_name(session: Session = Depends(get_session_api),
 
 
 @task_router.get("/get-id", response_model=PLTask)
-def get_task_by_id(session: Session, task_id: int | None = None) -> PLTask:
-    session = Depends(get_session_api)
+def get_task_by_id(session: Session = Depends(get_session_api),
+                   task_id: int | None = None) -> PLTask:
     try:
         task = TaskHandler.get_task(session, task_id)
     except Exception as e:
