@@ -66,7 +66,7 @@ def filter_task_by_type(session: Session = Depends(get_session_api),
 
 
 @task_router.post("/complete")
-def complete_task(session: Session, name: str | None = None) -> PLTask:
-    session = Depends(get_session_api)
+def complete_task(session: Session = Depends(get_session_api),
+                  name: str | None = None) -> PLTask:
     task = TaskHandler.get_task(session, name)
     return TaskHandler.complete_task(session, task)
