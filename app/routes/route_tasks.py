@@ -10,8 +10,8 @@ task_router = Router.task_router
 
 
 @task_router.get("/get-name", response_model=PLTask)
-def get_task_by_name(session: Session, name: str | None = None) -> PLTask:
-    session = Depends(get_session_api)
+def get_task_by_name(session: Session = Depends(get_session_api),
+                     name: str | None = None) -> PLTask:
     try:
         task = TaskHandler.get_task(session, name)
     except Exception as e:
