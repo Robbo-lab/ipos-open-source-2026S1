@@ -60,8 +60,8 @@ def create_task(session: Session = Depends(get_session_api),
 
 
 @task_router.get("/task-list")
-def filter_task_by_type(session: Session, task_type: str | None = None) -> list[PLTask]:
-    session = Depends(get_session_api)
+def filter_task_by_type(session: Session = Depends(get_session_api),
+                        task_type: str | None = None) -> list[PLTask]:
     return TaskHandler.list_tasks(session, task_type)
 
 
