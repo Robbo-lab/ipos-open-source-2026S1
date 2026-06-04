@@ -50,8 +50,8 @@ def delete_task_by_name(session: Session = Depends(get_session_api),
 
 
 @task_router.post("/add")
-def create_task(session: Session, task: PLTask = None) -> PLTask:
-    session = Depends(get_session_api)
+def create_task(session: Session = Depends(get_session_api),
+                task: PLTask = None) -> PLTask:
     try:
         task = TaskHandler.add_task_to_db(session, task)
     except Exception as e:
