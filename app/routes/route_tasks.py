@@ -44,8 +44,8 @@ def get_task_by_id(session: Session = Depends(get_session_api),
 
 
 @task_router.post("/delete")
-def delete_task_by_name(session: Session, name: str | None = None):
-    session = Depends(get_session_api)
+def delete_task_by_name(session: Session = Depends(get_session_api),
+                        name: str | None = None):
     TaskHandler.delete_task(session, name)
 
 
