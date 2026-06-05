@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -10,8 +12,7 @@ task_router = Router.task_router
 
 
 @task_router.get("/get-name", response_model=PLTask)
-def get_task_by_name(session: Session, name: str | None = None) -> PLTask:
-    session = Depends(get_session_api)
+def get_task_by_name(session: Annotated[Session, Depends(get_session_api)], name: str | None = None) -> PLTask:
     try:
         task = TaskHandler.get_task(session, name)
     except Exception as e:
@@ -27,8 +28,7 @@ def get_task_by_name(session: Session, name: str | None = None) -> PLTask:
 
 
 @task_router.get("/get-id", response_model=PLTask)
-def get_task_by_id(session: Session, task_id: int | None = None) -> PLTask:
-    session = Depends(get_session_api)
+def get_task_by_id(session: Annotated[Session, Depends(get_session_api)], task_id: int | None = None) -> PLTask:
     try:
         task = TaskHandler.get_task(session, task_id)
     except Exception as e:
@@ -44,14 +44,12 @@ def get_task_by_id(session: Session, task_id: int | None = None) -> PLTask:
 
 
 @task_router.post("/delete")
-def delete_task_by_name(session: Session, name: str | None = None):
-    session = Depends(get_session_api)
+def delete_task_by_name(session: Annotated[Session, Depends(get_session_api)], name: str | None = None):
     TaskHandler.delete_task(session, name)
 
 
 @task_router.post("/add")
-def create_task(session: Session, task: PLTask = None) -> PLTask:
-    session = Depends(get_session_api)
+def create_task(session: Annotated[Session, Depends(get_session_api)], task: PLTask = None) -> PLTask:
     try:
         task = TaskHandler.add_task_to_db(session, task)
     except Exception as e:
@@ -60,13 +58,11 @@ def create_task(session: Session, task: PLTask = None) -> PLTask:
 
 
 @task_router.get("/task-list")
-def filter_task_by_type(session: Session, task_type: str | None = None) -> list[PLTask]:
-    session = Depends(get_session_api)
+def filter_task_by_type(session: Annotated[Session, Depends(get_session_api)], task_type: str | None = None) -> list[PLTask]:
     return TaskHandler.list_tasks(session, task_type)
 
 
 @task_router.post("/complete")
-def complete_task(session: Session, name: str | None = None) -> PLTask:
-    session = Depends(get_session_api)
+def complete_task(session: Annotated[Session, Depends(get_session_api)], name: str | None = None) -> PLTask:
     task = TaskHandler.get_task(session, name)
     return TaskHandler.complete_task(session, task)
