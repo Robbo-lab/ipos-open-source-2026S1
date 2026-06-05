@@ -1,9 +1,5 @@
 # Unit Converter API + MCP (tools, resources, prompts)
 # Uses FastAPI for HTTP routes and FastMCP to expose tools/resources/prompts over HTTP/SSE transports.
-import datetime
-import os
-import platform
-import time
 from contextlib import asynccontextmanager
 
 import anyio
@@ -15,11 +11,8 @@ from app.llm.state import queue
 from app.mcp.mcp_prompts.converter_prompts import explain_conversion_prompt
 from app.mcp.mcp_resources.converter_resources import RESOURCE_DEFINITIONS
 from app.mcp.mcp_tools.miles_to_km import router as mile_to_km
-<<<<<<< HEAD
-from app.routes.router_handler import Router
-=======
 from app.routes.llm import router as llm_router
->>>>>>> 6e89dad (refactor: Combine MCP and LLM lifespans using AnyIO task group)
+from app.routes.router_handler import Router
 from app.utils.resource_utils import register_resources
 from app.security.rate_limit import RateLimitMiddleware
 
