@@ -12,7 +12,9 @@ task_router = Router.task_router
 
 
 @task_router.get("/get-name", response_model=PLTask)
-def get_task_by_name(session: Annotated[Session, Depends(get_session_api)], name: str | None = None) -> PLTask:
+def get_task_by_name(
+    session: Annotated[Session, Depends(get_session_api)], name: str | None = None
+) -> PLTask:
     try:
         if name is None:
             raise HTTPException(status_code=400, detail="name is required")
@@ -29,7 +31,9 @@ def get_task_by_name(session: Annotated[Session, Depends(get_session_api)], name
 
 
 @task_router.get("/get-id", response_model=PLTask)
-def get_task_by_id(session: Annotated[Session, Depends(get_session_api)], task_id: int | None = None) -> PLTask:
+def get_task_by_id(
+    session: Annotated[Session, Depends(get_session_api)], task_id: int | None = None
+) -> PLTask:
     try:
         if task_id is None:
             raise HTTPException(status_code=400, detail="task_id is required")
@@ -46,14 +50,18 @@ def get_task_by_id(session: Annotated[Session, Depends(get_session_api)], task_i
 
 
 @task_router.post("/delete")
-def delete_task_by_name(session: Annotated[Session, Depends(get_session_api)], name: str | None = None):
+def delete_task_by_name(
+    session: Annotated[Session, Depends(get_session_api)], name: str | None = None
+):
     if name is None:
         raise HTTPException(status_code=400, detail="name is required")
     TaskHandler.delete_task(session, name)
 
 
 @task_router.post("/add")
-def create_task(session: Annotated[Session, Depends(get_session_api)], task: PLTask | None = None) -> PLTask:
+def create_task(
+    session: Annotated[Session, Depends(get_session_api)], task: PLTask | None = None
+) -> PLTask:
     try:
         if task is None:
             raise HTTPException(status_code=400, detail="task is required")
@@ -64,12 +72,16 @@ def create_task(session: Annotated[Session, Depends(get_session_api)], task: PLT
 
 
 @task_router.get("/task-list")
-def filter_task_by_type(session: Annotated[Session, Depends(get_session_api)], task_type: str | None = None) -> list[PLTask]:
+def filter_task_by_type(
+    session: Annotated[Session, Depends(get_session_api)], task_type: str | None = None
+) -> list[PLTask]:
     return TaskHandler.list_tasks(session, task_type)
 
 
 @task_router.post("/complete")
-def complete_task(session: Annotated[Session, Depends(get_session_api)], name: str | None = None) -> PLTask:
+def complete_task(
+    session: Annotated[Session, Depends(get_session_api)], name: str | None = None
+) -> PLTask:
     if name is None:
         raise HTTPException(status_code=400, detail="name is required")
     task = TaskHandler.get_task(session, name)
