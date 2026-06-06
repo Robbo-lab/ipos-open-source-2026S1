@@ -46,7 +46,18 @@ class MCPTestClient:
         self.headers = dict(headers)
         self.session_id = None
 
-    def rpc(self, method: str, params: dict | None = None, rpc_id: int | str = 1):
+    def rpc(
+        self,
+        method: str,
+        params: dict | None = None,
+        rpc_id: int | str = 1,
+        **kwargs: Any,
+    ):
+        if "id" in kwargs:
+            rpc_id = kwargs.pop("id")
+        if kwargs:
+            raise TypeError(f"Unexpected keyword arguments: {', '.join(kwargs)}")
+
         payload: dict[str, Any] = {"jsonrpc": "2.0", "id": rpc_id, "method": method}
         if params is not None:
             payload["params"] = params
