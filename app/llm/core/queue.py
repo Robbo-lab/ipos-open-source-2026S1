@@ -6,6 +6,7 @@ from enum import StrEnum
 
 import anyio
 from pydantic import BaseModel, Field
+from result import Err, Ok, Result
 
 from app.llm.base import LLMResponse
 from app.llm.core.router import LLMRouteRequest, ModelRouter
@@ -24,24 +25,20 @@ class Job(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     status: JobStatus = JobStatus.PENDING
     request: LLMRouteRequest
-    result: LLMResponse | None = None
-    error: str | None = None
+    outcome: Result[LLMResponse, str] | None = None
     created_at: datetime.datetime = Field(default_factory=datetime.datetime.now)
     updated_at: datetime.datetime = Field(default_factory=datetime.datetime.now)
 
     def update_status(
         self,
         status: JobStatus,
-        result: LLMResponse | None = None,
-        error: str | None = None,
+        outcome: Result[LLMResponse, str] | None = None,
     ):
         """Helper to update status and timestamp."""
         self.status = status
         self.updated_at = datetime.datetime.now()
-        if result:
-            self.result = result
-        if error:
-            self.error = error
+        if outcome is not None:
+            self.outcome = outcome
 
 
 class AnyIOModelQueue:
@@ -100,9 +97,9 @@ class AnyIOModelQueue:
                 try:
                     # Simple direct call to the router
                     result = await self.router.generate(job.request)
-                    job.update_status(JobStatus.COMPLETED, result=result)
+                    job.update_status(JobStatus.COMPLETED, outcome=Ok(result))
                 except Exception as e:
-                    job.update_status(JobStatus.FAILED, error=str(e))
+                    job.update_status(JobStatus.FAILED, outcome=Err(str(e)))
 
     async def close(self):
         """Close the streams to stop the workers."""

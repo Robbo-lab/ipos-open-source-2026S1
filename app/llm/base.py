@@ -18,6 +18,8 @@ class LLMRequest:
     """Provider-agnostic request model."""
 
     prompt: str
+    messages: list[dict[str, Any]] = field(default_factory=list)
+    model: str | None = None
     extra: dict[str, Any] = field(default_factory=dict)
 
 

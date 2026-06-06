@@ -33,11 +33,14 @@ class LLMRouteRequest(BaseModel):
             last_msg = self.messages[-1]
             prompt = last_msg.content
 
-        extra = self.extra.copy()
-        extra["messages"] = [m.model_dump() for m in self.messages]
-        extra["model"] = self.model  # Pass model name in extra to avoid client mutation
+        messages = [m.model_dump() for m in self.messages]
 
-        return LLMRequest(prompt=prompt, extra=extra)
+        return LLMRequest(
+            prompt=prompt,
+            messages=messages,
+            model=self.model,
+            extra=self.extra.copy(),
+        )
 
 
 class ModelRouter:

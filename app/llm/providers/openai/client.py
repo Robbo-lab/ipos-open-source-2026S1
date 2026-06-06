@@ -5,6 +5,7 @@ from collections.abc import AsyncGenerator
 
 import httpx
 from httpx_sse import aconnect_sse
+from pydantic import TypeAdapter
 
 from app.llm.base import (
     BaseLLMClient,
@@ -15,6 +16,7 @@ from app.llm.base import (
 )
 from app.llm.providers.openai.models import (
     ChatCompletionRequest,
+    ChatCompletionRequestMessage,
     ChatCompletionResponse,
     ChatCompletionStreamResponse,
     ChatCompletionUserMessage,
@@ -69,10 +71,20 @@ class OpenAIClient(StreamingLLMClient, BaseLLMClient):
         Implementation of the BaseLLMClient interface.
         Translates a generic LLMRequest into an OpenAI-specific request.
         """
-        # Simple translation for now: prompt -> user message
+        model = request.model or self.model_name
+
+        # If full message history is provided, use it. Otherwise fall back to single prompt.
+        messages: list[ChatCompletionRequestMessage]
+        if request.messages:
+            messages = TypeAdapter(list[ChatCompletionRequestMessage]).validate_python(
+                request.messages
+            )
+        else:
+            messages = [ChatCompletionUserMessage(content=request.prompt)]
+
         openai_request = ChatCompletionRequest(
-            model=self.model_name,
-            messages=[ChatCompletionUserMessage(content=request.prompt)],
+            model=model,
+            messages=messages,
             stream=False,
             **request.extra,
         )
@@ -107,9 +119,19 @@ class OpenAIClient(StreamingLLMClient, BaseLLMClient):
         Implementation of the StreamingLLMClient interface.
         Translates a generic LLMRequest into an OpenAI-specific streaming request.
         """
+        model = request.model or self.model_name
+
+        messages: list[ChatCompletionRequestMessage]
+        if request.messages:
+            messages = TypeAdapter(list[ChatCompletionRequestMessage]).validate_python(
+                request.messages
+            )
+        else:
+            messages = [ChatCompletionUserMessage(content=request.prompt)]
+
         openai_request = ChatCompletionRequest(
-            model=self.model_name,
-            messages=[ChatCompletionUserMessage(content=request.prompt)],
+            model=model,
+            messages=messages,
             stream=True,
             **request.extra,
         )
