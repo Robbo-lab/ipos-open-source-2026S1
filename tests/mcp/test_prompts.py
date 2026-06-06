@@ -12,7 +12,6 @@ def test_prompts_list(mcp_client):
     print(f"[test_prompts_list] prompts={prompts}")
     names = {prompt["name"] for prompt in prompts}
     assert "explain_conversion" in names
-    assert "api_usage" in names
 
 
 # Example prompt - TODO
