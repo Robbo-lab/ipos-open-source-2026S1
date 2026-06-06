@@ -11,7 +11,6 @@ from app.llm.state import queue
 from app.mcp.mcp_prompts.converter_prompts import explain_conversion_prompt
 from app.mcp.mcp_resources.converter_resources import RESOURCE_DEFINITIONS
 from app.mcp.mcp_tools.miles_to_km import router as mile_to_km
-from app.routes.llm import router as llm_router
 from app.routes.router_handler import Router
 from app.utils.resource_utils import register_resources
 from app.security.rate_limit import RateLimitMiddleware
@@ -28,9 +27,6 @@ app.add_middleware(RateLimitMiddleware)
 
 # --- Register Tool ---
 app.include_router(mile_to_km)
-
-# --- Register LLM Routes ---
-app.include_router(llm_router)
 
 # --- Register System ---
 system_router = APIRouter(prefix="", tags=["system"])

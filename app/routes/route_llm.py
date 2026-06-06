@@ -1,13 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import HTTPException
 
 from app.llm.core.queue import Job
 from app.llm.core.router import LLMRouteRequest
 from app.llm.state import client
+from app.routes.router_handler import Router
 
-router = APIRouter(prefix="/v1/llm", tags=["llm"])
+router = Router.get_router("system")
 
 
-@router.post("/generate")
+@router.post("/v1/llm/generate")
 async def generate_sync(request: LLMRouteRequest):
     """
     Generate content synchronously.
@@ -24,7 +25,7 @@ async def generate_sync(request: LLMRouteRequest):
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
-@router.post("/enqueue", status_code=202)
+@router.post("/v1/llm/enqueue", status_code=202)
 async def generate_async(request: LLMRouteRequest):
     """
     Enqueue content for background generation.
@@ -42,7 +43,7 @@ async def generate_async(request: LLMRouteRequest):
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
-@router.get("/jobs/{job_id}", response_model=Job)
+@router.get("/v1/llm/jobs/{job_id}", response_model=Job)
 async def get_job_status(job_id: str):
     """Check the status and result of a background job."""
     if not client.queue:
