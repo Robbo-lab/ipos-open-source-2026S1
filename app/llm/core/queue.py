@@ -3,10 +3,11 @@ from __future__ import annotations
 import datetime
 import uuid
 from enum import StrEnum
+from typing import Literal, Union
 
 import anyio
 from pydantic import BaseModel, Field
-from result import Err, Ok, Result
+from pydantic.dataclasses import dataclass
 
 from app.llm.base import LLMResponse
 from app.llm.core.router import LLMRouteRequest, ModelRouter
@@ -18,27 +19,35 @@ class JobStatus(StrEnum):
     COMPLETED = "completed"
     FAILED = "failed"
 
-
-class Job(BaseModel):
-    """Represents a background LLM generation task."""
+class BaseJob(BaseModel):
+    """Common fields for all Job states."""
 
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    status: JobStatus = JobStatus.PENDING
     request: LLMRouteRequest
-    outcome: Result[LLMResponse, str] | None = None
     created_at: datetime.datetime = Field(default_factory=datetime.datetime.now)
     updated_at: datetime.datetime = Field(default_factory=datetime.datetime.now)
 
-    def update_status(
-        self,
-        status: JobStatus,
-        outcome: Result[LLMResponse, str] | None = None,
-    ):
-        """Helper to update status and timestamp."""
-        self.status = status
-        self.updated_at = datetime.datetime.now()
-        if outcome is not None:
-            self.outcome = outcome
+
+class PendingJob(BaseJob):
+    """A job that is waiting in the queue."""
+
+    status: Literal[JobStatus.PENDING] = JobStatus.PENDING
+
+
+class ProcessingJob(BaseJob):
+    """A job that is currently being executed by a worker."""
+
+    status: Literal[JobStatus.PROCESSING] = JobStatus.PROCESSING
+
+
+class FinishedJob(BaseJob):
+    """A job that has reached a terminal state (Success or Failure)."""
+
+    status: Literal[JobStatus.COMPLETED, JobStatus.FAILED]
+    outcome: Result[LLMResponse, str]
+
+
+type Job = PendingJob | ProcessingJob | FinishedJob
 
 
 class AnyIOModelQueue:
@@ -64,7 +73,7 @@ class AnyIOModelQueue:
         Create a job, add it to the store, and push it to the queue.
         Returns the job_id.
         """
-        job = Job(request=request)
+        job = PendingJob(request=request)
         self._jobs[job.id] = job
         await self._send_stream.send(job.id)
         return job.id
@@ -90,18 +99,55 @@ class AnyIOModelQueue:
         async with self._receive_stream.clone() as receiver:
             async for job_id in receiver:
                 job = self._jobs.get(job_id)
-                if not job:
+                if not job or job.status != JobStatus.PENDING:
                     continue
 
-                job.update_status(JobStatus.PROCESSING)
+                # Transition to processing
+                processing_job = ProcessingJob(
+                    **job.model_dump(exclude={"status"}),
+                    updated_at=datetime.datetime.now(),
+                )
+                self._jobs[job_id] = processing_job
+
                 try:
                     # Simple direct call to the router
                     result = await self.router.generate(job.request)
-                    job.update_status(JobStatus.COMPLETED, outcome=Ok(result))
+                    # Transition to completed
+                    self._jobs[job_id] = FinishedJob(
+                        **processing_job.model_dump(exclude={"status"}),
+                        status=JobStatus.COMPLETED,
+                        outcome=Ok[LLMResponse](root=result),
+                        updated_at=datetime.datetime.now(),
+                    )
                 except Exception as e:
-                    job.update_status(JobStatus.FAILED, outcome=Err(str(e)))
+                    # Transition to failed
+                    self._jobs[job_id] = FinishedJob(
+                        **processing_job.model_dump(exclude={"status"}),
+                        status=JobStatus.FAILED,
+                        outcome=Err[str](root=str(e)),
+                        updated_at=datetime.datetime.now(),
+                    )
 
     async def close(self):
         """Close the streams to stop the workers."""
         await self._send_stream.aclose()
         await self._receive_stream.aclose()
+
+
+@dataclass
+class Ok[T]:
+    """Successful result container."""
+
+    root: T
+    status: Literal["ok"] = "ok"
+
+
+@dataclass
+class Err[E]:
+    """Error result container."""
+
+    root: E
+    status: Literal["error"] = "error"
+
+
+type Result[T, E] = Ok[T] | Err[E]
