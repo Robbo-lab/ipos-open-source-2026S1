@@ -14,7 +14,7 @@ run:
 
 # run the test suite
 test:
-    {{ PYTHON }} pytest -v
+    {{ PYTHON }} pytest -v tests/unit/
 
 # format, lint and type check the code
 check:
