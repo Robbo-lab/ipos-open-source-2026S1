@@ -35,6 +35,8 @@ jobs:
           pip install -r requirements-dev.txt
       - name: Lint and format
         run: ruff check --output-format=github . && ruff format --preview .
+      - name: type check
+        run: ty check .
 
   test:
     name: Test (pytest)
