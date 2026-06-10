@@ -11,6 +11,7 @@ from app.mcp.mcp_resources.converter_resources import RESOURCE_DEFINITIONS
 from app.mcp.mcp_tools.miles_to_km import router as mile_to_km
 from app.routes.router_handler import Router
 from app.utils.resource_utils import register_resources
+from app.security.rate_limit import RateLimitMiddleware
 
 # FastAPI app for plain HTTP
 app = FastAPI(
@@ -18,6 +19,9 @@ app = FastAPI(
     description="FastAPI endpoints auto-exposed as MCP tools via FastMCP, with resources and prompts.",
     version="1.2.1",
 )
+
+# --- Rate Limiting ---
+app.add_middleware(RateLimitMiddleware)
 
 # --- Register Tool ---
 app.include_router(mile_to_km)
