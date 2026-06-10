@@ -13,11 +13,13 @@ from typing import Annotated
 
 class TaskInput(BaseModel):
     name: str = Field(description="Task title")
-    type: str = Field(description="Distance in miles (>= 0)")
     description: str = Field(description="Task description")
-    completed: bool = Field(description="Task status (Pending/Completed) Pending by default")
+    completed: bool = Field(description="Shows whether the task is completed or not. Contains True if completed or False if not")
     name_or_id: int | str = Field(description="Contains either id of a task or its name")
     task_started: datetime = Field(description="Date when the task was started, or current one if task was just added")
+
+class CreateTaskInput(BaseModel):
+    task: PLTask = Field(description="An PLTask instance of created task")
 
 class CompleteTaskInput(BaseModel):
     name: str = Field(description="Name of the task to complete")
@@ -31,6 +33,11 @@ class GetTaskByIdInput(BaseModel):
 class DeleteTaskByNameInput(BaseModel):
     name: str = Field(description="Name of the task to delete")
 
+class ListTasksInput(BaseModel):
+    task_type: str = Field(description="Task status (Pending/Completed) Pending by default")
+
+
+
 class GetTaskOutput(BaseModel):
     """Response model for task manager.
 
@@ -41,42 +48,58 @@ class GetTaskOutput(BaseModel):
     message: str = Field(description="Saves the message when the function is completed")
     task: PLTask | None= Field(description="Saves an instance of PLTask if it has been returned")
 
+class DeleteTaskByNameOutput(BaseModel):
+    message: str = Field(description="Saves the message when the function is completed")
 
-def create_task_tool(session: Annotated[Session, Depends(get_session_api)], name: str | None = None) -> PLTask:
+class CreateTaskOutput(BaseModel):
+    """Response model for task manager.
+
+    Attributes:
+        task: is an PLTask instance of created task.
     """
-    This method creates a new task
+    success: bool = Field(description="Shows whether the task was completed successfully or not")
+    message: str = Field(description="Saves the message when the function is completed")
+    task: PLTask | None= Field(description="Saves an instance of PLTask if it has been returned")
 
-    Args:
-        body: Request body containing the task parameters.
+class ListTasksOutput(BaseModel):
+    """Response model for task manager.
 
-    Returns:
-        PLTask type instance of a task which has been created.
+    Attributes:
+        task: is an PLTask instance of created task.
     """
-
-    taskHandler = TaskHandler()
-
-    # task = taskHandler.create_task(body.name, body.type, body.description, body.completed)
-    #
-    # return TaskOutput(
-    #     task=task
-    # )
+    success: bool = Field(description="Shows whether the task was completed successfully or not")
+    message: str = Field(description="Saves the message when the function is completed")
+    task: list[PLTask] | None= Field(description="Saves an instance of PLTask if it has been returned")
 
 
-def add_task_to_db_tool(body: TaskInput):
-    """
-    This method  adds task to the database
-
-    Args:
-        body: Request body containing the database.
-        TaskOutput: Contains PLTask instance of created task
-    """
-    # taskHandler = TaskHandler()
-    # taskHandler.add_task_to_db(body.db, TaskOutput.task)
 
 
-def delete_task_tool(session: Annotated[Session, Depends(get_session_api)], body: DeleteTaskByNameInput = None)->
+
+def create_task_tool(session: Annotated[Session, Depends(get_session_api)], body: CreateTaskInput = None) -> CreateTaskOutput:
+    try:
+        task = TaskHandler.add_task_to_db(session, body.task)
+    except Exception as e:
+        raise e
+
+    if task is None:
+        return CreateTaskOutput(
+            success= False,
+            message= f"Task '{body.task.name}' was not created",
+            task=task,
+        )
+
+    return CreateTaskOutput(
+        success=True,
+        message=f"Task '{body.task.name}' was completed",
+        task= task,
+    )
+
+def delete_task_tool(session: Annotated[Session, Depends(get_session_api)], body: DeleteTaskByNameInput = None)->DeleteTaskByNameOutput:
 
     TaskHandler.delete_task(session, body.name)
+    return DeleteTaskByNameOutput(
+        message=f"Task '{body.name}' was deleted",
+    )
 
 
 def get_task_by_name_tool(session: Annotated[Session, Depends(get_session_api)], body: GetTaskByNameInput = None)->GetTaskOutput:
@@ -117,20 +140,21 @@ def get_task_by_id_tool(session: Annotated[Session, Depends(get_session_api)], b
         task= task,
     )
 
-def list_tasks_tool(body: TaskInput):
-    """
-    This method gets all the task filtering by specified type (Complete or Pending).
+def list_tasks_tool(session: Annotated[Session, Depends(get_session_api)], body: ListTasksInput = None) -> ListTasksOutput:
+    filtered_tasks =TaskHandler.list_tasks(session, body.task_type)
 
-    Args:
-        body: request type and db from the body.
+    if filtered_tasks is None:
+        return ListTasksOutput(
+            success= False,
+            message= f"Task was not finished",
+            task=filtered_tasks,
+        )
 
-    Returns:
-        list: which contains filtered by status tasks from the database
-    """
-
-    taskHandler = TaskHandler()
-    taskHandler.list_tasks(body.db, body.type)
-
+    return ListTasksOutput(
+        success=True,
+        message=f"Task was completed",
+        task= filtered_tasks,
+    )
 
 
 
@@ -151,31 +175,12 @@ def complete_task_tool(session: Annotated[Session, Depends(get_session_api)], bo
         task=completed_task,
     )
 
-def task_run_duration_tool():
-    """
-    This method calculated the duration of how much time has been spent on a task.
-
-    Args:
-        task (PLTask): request an PLTask instance of a task from the TaskOutput.
-
-    Returns:
-        float: time it took to finish the task
-    """
-    taskHandler = TaskHandler()
-    taskHandler.task_run_duration(TaskOutput.task)
-
-
 TOOL_DEFINITION = [
     {
         "name": "create_task",
         "description": "Creates a task as an instance of PLTask",
         "func": create_task_tool,
         "tags": {"task", "create"},
-    },
-    {
-        "name": "add_task_to_db",
-        "description": "Saves the task PLTask instance in db.database",
-        "func": add_task_to_db_tool,
     },
     {
         "name": "delete_task",
@@ -185,20 +190,20 @@ TOOL_DEFINITION = [
     },
     {
         "name": "get_task",
-        "description": "gets the specified by the name or id task and returns it",
-        "func": get_task_tool,
-        "tags": {"get", "task", "check"},
+        "description": "gets the specified by the name task and returns it",
+        "func": get_task_by_name_tool,
+        "tags": {"get", "task", "check", "name"},
+    },
+    {
+        "name": "get_task",
+        "description": "gets the specified by id task and returns it",
+        "func": get_task_by_id_tool,
+        "tags": {"get", "task", "id", "check"},
     },
     {
         "name": "list_tasks",
         "description": "filters tasks by status either completed or pending and returns as a list",
         "func": list_tasks_tool,
         "tags": {"filter", "task", "completed", "pending"},
-    },
-    {
-        "name": "task_run_duration",
-        "description": "calculates how long did it take to finish the task",
-        "func": task_run_duration_tool,
-        "tags": {"duration", "time", "task"},
     },
 ]
