@@ -3,6 +3,12 @@ from app.core.exceptions import ValidationError
 from app.mcp.mcp_tools.miles_to_km import miles_to_kilometers_value
 
 EXPECTED_KM = 1.609
+CONVERSION_TOLERANCE = 0.001
+
+def test_known_conversion():
+    result = miles_to_kilometers_value(1)
+    assert abs(result - EXPECTED_KM) < CONVERSION_TOLERANCE
+
 
 def test_validation_error_is_exception():
     assert issubclass(ValidationError, Exception)
