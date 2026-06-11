@@ -1,7 +1,10 @@
+EXPECTED_STATUS_CODE = 200
+
+
 def test_root(base_url, http_client):
     response = http_client.get(f"{base_url}/")
 
-    assert response.status_code == 200
+    assert response.status_code == EXPECTED_STATUS_CODE
     body = response.json()
     print(f"[test_root] status_code={response.status_code}")
     print(f"[test_root] body={body}")
