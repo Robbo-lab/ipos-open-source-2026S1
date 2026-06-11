@@ -2,7 +2,7 @@ import math
 import time
 
 from fastapi import APIRouter, HTTPException
-from app.core.exceptions import ValidationException
+from app.core.exceptions import ValidationError
 from pydantic import BaseModel, Field
 
 router = APIRouter(prefix="", tags=["unit-conversion"])
@@ -43,17 +43,17 @@ def miles_to_kilometers_value(miles: float) -> float:
         ValueError: If a negative distance is provided.
     """
     if miles is None:
-        raise ValidationException("Miles is required.")
+        raise ValidationError("Miles is required.")
     if not isinstance(miles, (int, float)):
-        raise ValidationException("Miles must be a numeric value.")
+        raise ValidationError("Miles must be a numeric value.")
     if math.isnan(miles) or math.isinf(miles):
-        raise ValidationException("Miles must be a finite number.")
+        raise ValidationError("Miles must be a finite number.")
     if miles <= 0:
-        raise ValidationException("Distance must be greater than zero.")
+        raise ValidationError("Distance must be greater than zero.")
     if miles < 0.0001:  # noqa: PLR2004
-        raise ValidationException("Distance is too small to be meaningful.")
+        raise ValidationError("Distance is too small to be meaningful.")
     if miles > MAX_TUTORIAL_MILES:
-        raise ValidationException(
+        raise ValidationError(
             "Distance is unrealistically large for this tutorial example."
             )
 
@@ -81,10 +81,10 @@ def miles_to_kilometers(
             operation="miles_to_kilometers",
             audited_at=time.time(),
         )
-    except ValidationException as exc: 
-        raise HTTPException(status_code=400, detail=str(exc))
-    except ValueError as exc:  # Keep HTTP response friendly
-        raise ValidationException(status_code=400, detail=str(exc))  # noqa: B904
+    except ValidationError as exc: 
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except ValueError as exc:  
+        raise HTTPException(status_code=400, detail=str(exc))  from exc
 
 
 TOOL_DEFINITION = [
