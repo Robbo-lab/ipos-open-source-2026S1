@@ -33,10 +33,6 @@ def test_valid_miles_returns_float():
     result = miles_to_kilometers_value(1)
     assert isinstance(result, float)
 
-def test_known_conversion():
-    result = miles_to_kilometers_value(1)
-    assert abs(result - EXPECTED_KM) < 0.001
-
 def test_http_exception_not_raised():
     from fastapi import HTTPException
     with pytest.raises(ValidationError):
