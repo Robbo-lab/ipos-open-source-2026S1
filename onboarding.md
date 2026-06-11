@@ -111,7 +111,7 @@ Follow **GitHub Flow**:
 
 ## **8. Development Environment Setup**
 
-- **Python 3.14+** is required.
+- **Python 3.13** is required.
 - Install dependencies:
 
   ```bash
@@ -130,7 +130,7 @@ Follow **GitHub Flow**:
 
   ```bash
   uv sync --group=dev
-  ````
+  ```
 
 - Recommended tools:
   - IDE: PyCharm or Visual Studio Code.
