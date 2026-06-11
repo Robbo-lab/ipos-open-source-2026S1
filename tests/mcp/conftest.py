@@ -14,7 +14,7 @@ collect_ignore = ["test_explain_prompt.py", "test_usage_prompt.py"]
 
 @pytest.fixture(scope="session")
 def base_url() -> str:
-    return os.getenv("MCP_BASE_URL", settings.mcp_base_url)
+    return os.getenv("MCP_BASE_URL", settings.mcp_base_url).rstrip("/")
 
 
 @pytest.fixture(scope="session")
