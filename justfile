@@ -22,7 +22,7 @@ check:
     ty check .
 
 install-deps:
-    command -v uv >/dev/null 2>&1 && echo "uv run sync" || echo "python3 -m pip-r requirements-dev.txt "
+    command -v uv >/dev/null 2>&1 && echo "uv run sync" || echo "python3.13 -m pip-r requirements-dev.txt "
 
 # update dependencies
 update-dependencies:
