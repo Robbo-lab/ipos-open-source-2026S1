@@ -1,6 +1,7 @@
 import unittest
 
 from app.core.settings import settings, Settings
+from pydantic import ValidationError
 
 
 class TestSettings(unittest.TestCase):
@@ -55,6 +56,11 @@ class TestSettings(unittest.TestCase):
         """Protocol version follows YYYY-MM-DD date format."""
         parts = settings.mcp_protocol_version.split("-")
         self.assertEqual(len(parts), 3)
+
+    def test_invalid_port_type_raises_error(self):
+        """Passing a non-integer-like value for port raises a validation error."""
+        with self.assertRaises(ValidationError):
+            Settings(port="not_a_number")
 
 
 if __name__ == "__main__":

@@ -2,11 +2,11 @@
 Centralised configuration settings for the application.
 Holds runtime configuration values used across the application and tests.
 """
-from dataclasses import dataclass
+from pydantic import BaseModel
 
 
-@dataclass
-class Settings:
+class Settings(BaseModel):
+
     """
     Configuration settings for the application.
     """
