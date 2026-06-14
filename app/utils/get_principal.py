@@ -27,6 +27,8 @@ def get_current_principal(
     token = authorisation.split(" ", 1)[1]
 
     # Demo permission to principal mapping—replace with JWT claims extraction
-    roles = {"utility.read", "conversion.run"} if "demo-token" in token else set()
-    scopes = {"miles:convert"} if "demo-token" in token else set()
+    # roles = {"utility.read", "conversion.run"} if "demo-token" in token else set()
+    # scopes = {"miles:convert"} if "demo-token" in token else set()
+    roles = {"task.read"} if "demo-token" in token else set()
+    scopes = {"tasks:read"} if "demo-token" in token else set()
     return Principal(user_id="demo-llm-client", roles=roles, scopes=scopes)
