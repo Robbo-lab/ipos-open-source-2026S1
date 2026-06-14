@@ -7,7 +7,6 @@ from fastapi import APIRouter, HTTPException
 
 
 class Router:
-
     # Routers must have the word "_router" in it
 
     system_router = APIRouter(prefix="", tags=["system"])
@@ -17,7 +16,6 @@ class Router:
     def load_all_routes(cls):
         for root, _dirs, files in os.walk("app/routes"):
             for file in files:
-
                 file_path = os.path.join(root, file)
                 try:
                     if "__pycache__" in file_path:
@@ -29,7 +27,7 @@ class Router:
                         module = module_from_spec(spec)
                         spec.loader.exec_module(module)
 
-                except (UnicodeDecodeError, PermissionError):
+                except UnicodeDecodeError, PermissionError:
                     continue
 
     @classmethod
@@ -49,11 +47,9 @@ class Router:
             try:
                 return getattr(cls, router_name)
             except ModuleNotFoundError as err:
-                raise HTTPException(status_code=404,
-                                    detail="Router not found") from err
+                raise HTTPException(status_code=404, detail="Router not found") from err
         else:
             try:
                 return getattr(cls, router_name + "_router")
             except ModuleNotFoundError as err:
-                raise HTTPException(status_code=404,
-                                    detail="Router not found") from err
+                raise HTTPException(status_code=404, detail="Router not found") from err

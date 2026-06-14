@@ -1,54 +1,76 @@
-# from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
-from app.api.task_handler import TaskHandler
 from datetime import datetime
+from typing import Annotated
+
+from fastapi import Depends
+from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
+
+from app.api.task_handler import TaskHandler
 from app.data.pydantic_objects import PLTask
 from app.services.database import get_session_api
-from fastapi import Depends, HTTPException
-from sqlalchemy.orm import Session
-from typing import Annotated
-from app.utils.permissions import enforce_task_read_permissions, enforce_task_write_permissions
 from app.utils.get_principal import Principal
+from app.utils.permissions import (
+    enforce_task_read_permissions,
+    enforce_task_write_permissions,
+)
 
 
-# router = APIRouter(prefix="", tags=["managing-task"])
-
-# GetInput
 class TaskInput(BaseModel):
     """Input schema for task manager tools."""
 
-    name: str = Field(description="Title of the task. Use this when creating or updating a task.")
-    description: str = Field(description="Detailed description of what the task is about.")
-    completed: bool = Field(description="Task completion status. True means completed, False means not completed.")
-    task_started: datetime = Field(description="Date and time when the task was started. Use the current datetime when creating a new task.")
+    name: str = Field(
+        description="Title of the task. Use this when creating or updating a task."
+    )
+    description: str = Field(
+        description="Detailed description of what the task is about."
+    )
+    completed: bool = Field(
+        description="Task completion status. True means completed, False means not completed."
+    )
+    task_started: datetime = Field(
+        description="Date and time when the task was started. Use the current datetime when creating a new task."
+    )
+
 
 class CreateTaskInput(BaseModel):
     """Input schema for creating a new task."""
 
-    task: PLTask = Field(description="The task to be created, including its title, description, status, and metadata.")
+    task: PLTask = Field(
+        description="The task to be created, including its title, description, status, and metadata."
+    )
+
 
 class CompleteTaskInput(BaseModel):
     """Input schema for marking a task as completed."""
 
     name: str = Field(description="Name of the task to mark as completed.")
 
+
 class GetTaskByNameInput(BaseModel):
     """Input schema for retrieving a task by its name."""
 
     name: str = Field(description="Exact name of the task to search for.")
 
+
 class GetTaskByIdInput(BaseModel):
     """Input schema for retrieving a task by its name."""
+
     id: str = Field(description="Exact id of the task to search for.")
+
 
 class DeleteTaskByNameInput(BaseModel):
     """Input schema for deleting a task by its name."""
+
     name: str = Field(description="Exact name of the task to delete.")
+
 
 class ListTasksInput(BaseModel):
     """Input schema for listing tasks by status."""
 
-    task_type: str = Field(description="Task status filter. Valid values are 'Pending' or 'Completed'. Defaults to 'Pending'.")
+    task_type: str = Field(
+        description="Task status filter. Valid values are 'Pending' or 'Completed'. Defaults to 'Pending'."
+    )
+
 
 # GetOutput
 class GetTaskOutput(BaseModel):
@@ -60,17 +82,28 @@ class GetTaskOutput(BaseModel):
         task: The retrieved task, or None if no task was found.
     """
 
-    success: bool = Field(description="Indicates whether the operation completed successfully.")
-    message: str = Field(description="Human-readable message describing the result of the operation.")
-    task: PLTask | None = Field(description="The task returned by the operation, or None if no task was found.")
+    success: bool = Field(
+        description="Indicates whether the operation completed successfully."
+    )
+    message: str = Field(
+        description="Human-readable message describing the result of the operation."
+    )
+    task: PLTask | None = Field(
+        description="The task returned by the operation, or None if no task was found."
+    )
+
 
 class DeleteTaskByNameOutput(BaseModel):
     """Response model for deleting a task.
+
     Attributes:
         message: Human-readable message describing the result.
     """
 
-    message: str = Field(description="Message describing the result of the delete operation.")
+    message: str = Field(
+        description="Message describing the result of the delete operation."
+    )
+
 
 class CreateTaskOutput(BaseModel):
     """Response model for creating a task.
@@ -81,9 +114,16 @@ class CreateTaskOutput(BaseModel):
         task: The created task, or None if creation failed.
     """
 
-    success: bool = Field(description="Indicates whether the task was created successfully.")
-    message: str = Field(description="Human-readable message describing the result of the operation.")
-    task: PLTask | None = Field(description="The created task, or None if task creation failed.")
+    success: bool = Field(
+        description="Indicates whether the task was created successfully."
+    )
+    message: str = Field(
+        description="Human-readable message describing the result of the operation."
+    )
+    task: PLTask | None = Field(
+        description="The created task, or None if task creation failed."
+    )
+
 
 class ListTasksOutput(BaseModel):
     """Response model for listing tasks.
@@ -94,28 +134,38 @@ class ListTasksOutput(BaseModel):
         tasks: List of tasks matching the requested criteria, or None if no tasks were found.
     """
 
-    success: bool = Field(description="Indicates whether the tasks were retrieved successfully.")
-    message: str = Field(description="Human-readable message describing the result of the operation.")
-    tasks: list[PLTask] | None = Field(description="List of tasks returned by the operation, or None if no tasks were found.")
+    success: bool = Field(
+        description="Indicates whether the tasks were retrieved successfully."
+    )
+    message: str = Field(
+        description="Human-readable message describing the result of the operation."
+    )
+    tasks: list[PLTask] | None = Field(
+        description="List of tasks returned by the operation, or None if no tasks were found."
+    )
 
 
-def create_task_tool(session: Annotated[Session, Depends(get_session_api)], principal: Principal, body: CreateTaskInput = None) -> CreateTaskOutput:
+def create_task_tool(
+    session: Annotated[Session, Depends(get_session_api)],
+    principal: Principal,
+    body: CreateTaskInput = None,
+) -> CreateTaskOutput:
     """Create a new task in the task manager.
 
-        Use this tool when the user wants to create or add a new task.
-        Do not use this tool to update, complete, retrieve, or delete tasks.
+    Use this tool when the user wants to create or add a new task.
+    Do not use this tool to update, complete, retrieve, or delete tasks.
 
-        Args:
-            session: Database session used to access task data.
-            body: Request containing the task to create.
-            principal: Authenticated principal used for permission checks.
+    Args:
+        session: Database session used to access task data.
+        body: Request containing the task to create.
+        principal: Authenticated principal used for permission checks.
 
-        Returns:
-            CreateTaskOutput containing:
-            - success: Whether the task was created successfully.
-            - message: Description of the operation result.
-            - task: The created task, if successful.
-        """
+    Returns:
+        CreateTaskOutput containing:
+        - success: Whether the task was created successfully.
+        - message: Description of the operation result.
+        - task: The created task, if successful.
+    """
     enforce_task_write_permissions(principal)
 
     try:
@@ -125,31 +175,36 @@ def create_task_tool(session: Annotated[Session, Depends(get_session_api)], prin
 
     if task is None:
         return CreateTaskOutput(
-            success= False,
-            message= f"Task '{body.task.name}' was not created",
+            success=False,
+            message=f"Task '{body.task.name}' was not created",
             task=task,
         )
 
     return CreateTaskOutput(
         success=True,
         message=f"Task '{body.task.name}' was created",
-        task= task,
+        task=task,
     )
 
-def delete_task_tool(session: Annotated[Session, Depends(get_session_api)], principal: Principal, body: DeleteTaskByNameInput = None)->DeleteTaskByNameOutput:
+
+def delete_task_tool(
+    session: Annotated[Session, Depends(get_session_api)],
+    principal: Principal,
+    body: DeleteTaskByNameInput = None,
+) -> DeleteTaskByNameOutput:
     """Delete an existing task by its name.
 
-        Use this tool only when the user explicitly requests to delete or remove a task.
+    Use this tool only when the user explicitly requests to delete or remove a task.
 
-        Args:
-            session: Database session used to access task data.
-            body: Request containing the exact name of the task to delete.
-            principal: Authenticated principal used for permission checks.
+    Args:
+        session: Database session used to access task data.
+        body: Request containing the exact name of the task to delete.
+        principal: Authenticated principal used for permission checks.
 
-        Returns:
-            DeleteTaskByNameOutput containing:
-            - message: Description of the operation result.
-        """
+    Returns:
+        DeleteTaskByNameOutput containing:
+        - message: Description of the operation result.
+    """
     enforce_task_write_permissions(principal)
 
     TaskHandler.delete_task(session, body.name)
@@ -158,22 +213,27 @@ def delete_task_tool(session: Annotated[Session, Depends(get_session_api)], prin
     )
 
 
-def get_task_by_name_tool(session: Annotated[Session, Depends(get_session_api)], principal: Principal, body: GetTaskByNameInput = None)->GetTaskOutput:
+def get_task_by_name_tool(
+    session: Annotated[Session, Depends(get_session_api)],
+    principal: Principal,
+    body: GetTaskByNameInput = None,
+) -> GetTaskOutput:
     """Retrieve a task by its name.
 
-       Use this tool when the user wants to view, find, or get information
-       about a specific task.
-       Args:
-           session: Database session used to access task data.
-           principal: Authenticated principal used for permission checks.
-           body: Request containing the exact name of the task to retrieve.
+    Use this tool when the user wants to view, find, or get information
+    about a specific task.
 
-       Returns:
-           GetTaskOutput containing:
-           - success: Whether the task was found.
-           - message: Description of the operation result.
-           - task: The retrieved task, if found.
-       """
+    Args:
+        session: Database session used to access task data.
+        principal: Authenticated principal used for permission checks.
+        body: Request containing the exact name of the task to retrieve.
+
+    Returns:
+        GetTaskOutput containing:
+        - success: Whether the task was found.
+        - message: Description of the operation result.
+        - task: The retrieved task, if found.
+    """
     enforce_task_read_permissions(principal)
 
     try:
@@ -183,34 +243,39 @@ def get_task_by_name_tool(session: Annotated[Session, Depends(get_session_api)],
 
     if task is None:
         return GetTaskOutput(
-            success= False,
-            message= f"Task '{body.name}' was not found",
+            success=False,
+            message=f"Task '{body.name}' was not found",
             task=task,
         )
 
     return GetTaskOutput(
         success=True,
         message=f"Task '{body.name}' was completed",
-        task= task,
+        task=task,
     )
 
-def get_task_by_id_tool(session: Annotated[Session, Depends(get_session_api)], principal: Principal, body: GetTaskByIdInput = None)->GetTaskOutput:
+
+def get_task_by_id_tool(
+    session: Annotated[Session, Depends(get_session_api)],
+    principal: Principal,
+    body: GetTaskByIdInput = None,
+) -> GetTaskOutput:
     """Retrieve a task by its ID.
 
-        Use this tool when the user wants to view, find, or get information
-        about a specific task and provides the task ID.
+    Use this tool when the user wants to view, find, or get information
+    about a specific task and provides the task ID.
 
-        Args:
-            session: Database session used to access task data.
-            body: Request containing the unique ID of the task to retrieve.
-            principal: Authenticated principal used for permission checks.
+    Args:
+        session: Database session used to access task data.
+        body: Request containing the unique ID of the task to retrieve.
+        principal: Authenticated principal used for permission checks.
 
-        Returns:
-            GetTaskOutput containing:
-            - success: Whether the task was found.
-            - message: Description of the operation result.
-            - task: The retrieved task, if found.
-        """
+    Returns:
+        GetTaskOutput containing:
+        - success: Whether the task was found.
+        - message: Description of the operation result.
+        - task: The retrieved task, if found.
+    """
     enforce_task_read_permissions(principal)
 
     try:
@@ -220,35 +285,39 @@ def get_task_by_id_tool(session: Annotated[Session, Depends(get_session_api)], p
 
     if task is None:
         return GetTaskOutput(
-            success= False,
-            message= f"Task '{body.name}' was not found",
+            success=False,
+            message=f"Task '{body.name}' was not found",
             task=task,
         )
 
     return GetTaskOutput(
         success=True,
         message=f"Task '{body.name}' was completed",
-        task= task,
+        task=task,
     )
 
-def list_tasks_tool(session: Annotated[Session, Depends(get_session_api)], principal: Principal, body: ListTasksInput = None) -> ListTasksOutput:
+
+def list_tasks_tool(
+    session: Annotated[Session, Depends(get_session_api)],
+    principal: Principal,
+    body: ListTasksInput = None,
+) -> ListTasksOutput:
     """Retrieve a list of tasks filtered by status.
 
-        Use this tool when the user wants to view multiple tasks,
-        such as all pending or all completed tasks.
+    Use this tool when the user wants to view multiple tasks,
+    such as all pending or all completed tasks.
 
-        Args:
-            session: Database session used to access task data.
-            body: Request containing the task status filter.
-            principal: Authenticated principal used for permission checks.
-            
-        Returns:
+    Args:
+        session: Database session used to access task data.
+        body: Request containing the task status filter.
+        principal: Authenticated principal used for permission checks.
 
+    Returns:
             ListTasksOutput containing:
-            - success: Whether matching tasks were found.
-            - message: Description of the operation result.
-            - tasks: List of tasks matching the requested status.
-        """
+        - success: Whether matching tasks were found.
+        - message: Description of the operation result.
+        - tasks: List of tasks matching the requested status.
+    """
     enforce_task_read_permissions(principal)
 
     filtered_tasks = TaskHandler.list_tasks(session, body.task_type)
@@ -266,24 +335,27 @@ def list_tasks_tool(session: Annotated[Session, Depends(get_session_api)], princ
     )
 
 
-
-def complete_task_tool(session: Annotated[Session, Depends(get_session_api)], principal: Principal, body: CompleteTaskInput = None)->GetTaskOutput:
+def complete_task_tool(
+    session: Annotated[Session, Depends(get_session_api)],
+    principal: Principal,
+    body: CompleteTaskInput = None,
+) -> GetTaskOutput:
     """Mark an existing task as completed.
 
-        Use this tool when the user wants to complete, finish,
-        or mark a task as done.
+    Use this tool when the user wants to complete, finish,
+    or mark a task as done.
 
-        Args:
-            session: Database session used to access task data.
-            body: Request containing the name of the task to complete.
-            principal: Authenticated principal used for permission checks.
+    Args:
+        session: Database session used to access task data.
+        body: Request containing the name of the task to complete.
+        principal: Authenticated principal used for permission checks.
 
-        Returns:
-            GetTaskOutput containing:
-            - success: Whether the task was found and completed.
-            - message: Description of the operation result.
-            - task: The updated task with completed status set to True.
-        """
+    Returns:
+        GetTaskOutput containing:
+        - success: Whether the task was found and completed.
+        - message: Description of the operation result.
+        - task: The updated task with completed status set to True.
+    """
     enforce_task_write_permissions(principal)
 
     task = TaskHandler.get_task(session, body.name)
@@ -298,9 +370,10 @@ def complete_task_tool(session: Annotated[Session, Depends(get_session_api)], pr
 
     return GetTaskOutput(
         success=True,
-        message= f"Task '{body.name}' was completed",
+        message=f"Task '{body.name}' was completed",
         task=completed_task,
     )
+
 
 TOOL_DEFINITION = [
     {
@@ -342,8 +415,7 @@ TOOL_DEFINITION = [
     {
         "name": "list_tasks",
         "description": (
-            "List tasks filtered by status. "
-            "Use to retrieve pending or completed tasks."
+            "List tasks filtered by status. Use to retrieve pending or completed tasks."
         ),
         "func": list_tasks_tool,
         "tags": {"task", "list", "filter", "completed", "pending"},

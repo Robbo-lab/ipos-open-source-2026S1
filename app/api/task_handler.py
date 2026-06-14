@@ -22,24 +22,26 @@ class TaskHandler:
     """
 
     @classmethod
-    def create_task(cls, name: str, _type: str,
-                    description: str, completed: bool = False) -> PLTask:
-        return PLTask(name=name,
-                      type=_type,
-                      description=description,
-                      completed=completed)
+    def create_task(
+        cls, name: str, _type: str, description: str, completed: bool = False
+    ) -> PLTask:
+        return PLTask(
+            name=name, type=_type, description=description, completed=completed
+        )
 
     # creates a task with curl content
     @classmethod
     def add_task_to_db(cls, db: Session, task: PLTask):
         """Creates a task and adds it to the misc."""
         print(db)
-        new_task_obj = DBTask(id=task.id or None,
-                              name=task.name,
-                              type=task.type,
-                              description=task.description,
-                              completed=task.completed or False,
-                              task_started=task.task_started or datetime.now())
+        new_task_obj = DBTask(
+            id=task.id or None,
+            name=task.name,
+            type=task.type,
+            description=task.description,
+            completed=task.completed or False,
+            task_started=task.task_started or datetime.now(),
+        )
 
         new_task_obj = DataBaseMethods.add_object(db, new_task_obj)
 
@@ -115,8 +117,7 @@ class TaskHandler:
                 db.commit()
                 return task
             except Exception as err:
-                raise HTTPException(status_code=500,
-                                    detail=str(err)) from err
+                raise HTTPException(status_code=500, detail=str(err)) from err
         else:
             raise HTTPException(status_code=404, detail="Task not found")
 
@@ -125,8 +126,7 @@ class TaskHandler:
         if task.task_started and task.task_ended:
             time_elapsed = task.task_ended - task.task_started
             return time_elapsed.total_seconds()
-        raise HTTPException(status_code=500,
-                            detail="Task hasn't finished running")
+        raise HTTPException(status_code=500, detail="Task hasn't finished running")
 
     @classmethod
     def __from_db_to_pl(cls, dbtask: DBTask):

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import os
 from typing import Any
 
@@ -10,8 +9,6 @@ from app.llm.base import BaseLLMClient, LLMRequest
 from app.llm.providers.gemini.client import GeminiClient
 from app.llm.providers.gemini.models import (
     GenerateContentRequest,
-    is_function_call_part,
-    is_text_part,
 )
 
 load_dotenv()

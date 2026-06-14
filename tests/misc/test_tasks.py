@@ -7,37 +7,72 @@ from app.services.database import LocalSession, clear_table
 
 
 class TaskTests(unittest.TestCase):
-
     def setUp(self):
         self.session = LocalSession()
         self.example_pltasks = [
-            PLTask(name="Task1", type="Agriculture", description="Give names for 100 plants", completed=False),
-            PLTask(name="Task2", type="Construction", description="Give price for new airport", completed=True)
+            PLTask(
+                name="Task1",
+                type="Agriculture",
+                description="Give names for 100 plants",
+                completed=False,
+            ),
+            PLTask(
+                name="Task2",
+                type="Construction",
+                description="Give price for new airport",
+                completed=True,
+            ),
         ]
         self.example_dbtask = [
-            PLTask(id=1, name="Task1", type="Agriculture", description="Give names for 100 plants", completed=False),
-            PLTask(id=2, name="Task2", type="Construction", description="Give price for new airport", completed=True)
+            PLTask(
+                id=1,
+                name="Task1",
+                type="Agriculture",
+                description="Give names for 100 plants",
+                completed=False,
+            ),
+            PLTask(
+                id=2,
+                name="Task2",
+                type="Construction",
+                description="Give price for new airport",
+                completed=True,
+            ),
         ]
 
     def test_creating_tasks(self):
-        task1 = TaskHandler.create_task("Task1", "Agriculture", "Give names for 100 plants", False)
-        task2 = TaskHandler.create_task("Task2", "Construction", "Give price for new airport", True)
+        task1 = TaskHandler.create_task(
+            "Task1", "Agriculture", "Give names for 100 plants", False
+        )
+        task2 = TaskHandler.create_task(
+            "Task2", "Construction", "Give price for new airport", True
+        )
 
         self.assertEqual(self.example_pltasks[0], task1)
         self.assertEqual(self.example_pltasks[1], task2)
 
     def test_adding_task_to_db(self):
         clear_table(self.session, DBTask)
-        self.assertEqual(self.example_dbtask[0], TaskHandler.add_task_to_db(self.session, self.example_pltasks[0]))
-        self.assertEqual(self.example_dbtask[1], TaskHandler.add_task_to_db(self.session, self.example_pltasks[1]))
+        self.assertEqual(
+            self.example_dbtask[0],
+            TaskHandler.add_task_to_db(self.session, self.example_pltasks[0]),
+        )
+        self.assertEqual(
+            self.example_dbtask[1],
+            TaskHandler.add_task_to_db(self.session, self.example_pltasks[1]),
+        )
 
     def test_finding_task_by_name(self):
         clear_table(self.session, DBTask)
         TaskHandler.add_task_to_db(self.session, self.example_pltasks[0])
         TaskHandler.add_task_to_db(self.session, self.example_pltasks[1])
 
-        self.assertEqual(self.example_dbtask[0], TaskHandler.get_task(self.session, "Task1"))
-        self.assertEqual(self.example_dbtask[1], TaskHandler.get_task(self.session, "Task2"))
+        self.assertEqual(
+            self.example_dbtask[0], TaskHandler.get_task(self.session, "Task1")
+        )
+        self.assertEqual(
+            self.example_dbtask[1], TaskHandler.get_task(self.session, "Task2")
+        )
 
     def test_finding_task_by_id(self):
         clear_table(self.session, DBTask)
