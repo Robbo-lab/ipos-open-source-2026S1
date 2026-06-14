@@ -48,7 +48,7 @@ line-length = 88
 fix = true
 unsafe-fixes = true
 preview = true
-extend-exclude = [""]
+extend-exclude = ["app/docs/sphinx-docs/source/conf.py"]
 
 [tool.ruff.lint]
 select = [
