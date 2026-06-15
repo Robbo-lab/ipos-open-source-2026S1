@@ -31,7 +31,8 @@ def test_log_decorator_writes_log_entries(tmp_path: Path) -> None:
     def sample(a: int, b: int) -> int:
         return a + b
 
-    assert sample(2, 3) == 5
+    expected_result = 5
+    assert sample(2, 3) == expected_result
 
     text = log_file.read_text(encoding="utf-8")
     assert "Calling sample" in text

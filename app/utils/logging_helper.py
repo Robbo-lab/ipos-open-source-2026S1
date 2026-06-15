@@ -114,6 +114,48 @@ def _ensure_file_handler(logger: Logger, log_file: Path, level: int) -> None:
     logger.addHandler(handler)
 
 
+def _build_sync_wrapper(func: F, logger: Logger, level_value: int) -> Callable[[Any], Any]:
+    @wraps(func)
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        logger.log(
+            level_value,
+            "Calling %s with args=%s kwargs=%s",
+            func.__name__,
+            args,
+            kwargs,
+        )
+        try:
+            result = func(*args, **kwargs)
+            logger.log(level_value, "%s completed successfully", func.__name__)
+            return result
+        except Exception:  # pragma: no cover
+            logger.exception("Exception in %s", func.__name__)
+            raise
+
+    return wrapper
+
+
+def _build_async_wrapper(func: F, logger: Logger, level_value: int) -> Callable[[Any], Any]:
+    @wraps(func)
+    async def wrapper(*args: Any, **kwargs: Any) -> Any:
+        logger.log(
+            level_value,
+            "Calling %s with args=%s kwargs=%s",
+            func.__name__,
+            args,
+            kwargs,
+        )
+        try:
+            result = await func(*args, **kwargs)
+            logger.log(level_value, "%s completed successfully", func.__name__)
+            return result
+        except Exception:  # pragma: no cover
+            logger.exception("Exception in %s", func.__name__)
+            raise
+
+    return wrapper
+
+
 def log_decorator(
     logger_name: str = "app",
     level: str = "INFO",
@@ -132,39 +174,11 @@ def log_decorator(
         logger.setLevel(level_value)
         _ensure_file_handler(logger, filename, level_value)
 
-        async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
-            logger.log(
-                level_value,
-                "Calling %s with args=%s kwargs=%s",
-                func.__name__,
-                args,
-                kwargs,
-            )
-            try:
-                result = await func(*args, **kwargs)
-                logger.log(level_value, "%s completed successfully", func.__name__)
-                return result
-            except Exception:  # pragma: no cover
-                logger.exception("Exception in %s", func.__name__)
-                raise
+        if inspect.iscoroutinefunction(func):
+            wrapper = _build_async_wrapper(func, logger, level_value)
+        else:
+            wrapper = _build_sync_wrapper(func, logger, level_value)
 
-        def sync_wrapper(*args: Any, **kwargs: Any) -> Any:
-            logger.log(
-                level_value,
-                "Calling %s with args=%s kwargs=%s",
-                func.__name__,
-                args,
-                kwargs,
-            )
-            try:
-                result = func(*args, **kwargs)
-                logger.log(level_value, "%s completed successfully", func.__name__)
-                return result
-            except Exception:  # pragma: no cover
-                logger.exception("Exception in %s", func.__name__)
-                raise
-
-        wrapper = async_wrapper if inspect.iscoroutinefunction(func) else sync_wrapper
-        return wraps(func)(wrapper)
+        return wrapper
 
     return decorator
