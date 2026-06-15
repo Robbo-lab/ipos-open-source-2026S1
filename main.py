@@ -3,6 +3,8 @@
 
 # Create Database
 
+from pathlib import Path
+
 from fastapi import APIRouter, FastAPI
 from fastmcp import FastMCP
 
@@ -10,8 +12,33 @@ from app.mcp.mcp_prompts.converter_prompts import explain_conversion_prompt
 from app.mcp.mcp_resources.converter_resources import RESOURCE_DEFINITIONS
 from app.mcp.mcp_tools.miles_to_km import router as mile_to_km
 from app.routes.router_handler import Router
+from app.utils.logging_helper import build_log_config, log_decorator, setup_logging
 from app.utils.resource_utils import register_resources
 from app.security.rate_limit import RateLimitMiddleware
+
+# Shared logging configuration for REST, MCP, and helper code.
+LOG_FILE = Path("logs/mcp_log_streamable_http.log")
+LOG_CONFIG = build_log_config(
+    LOG_FILE,
+    logger_handlers={
+        "uvicorn": ["rotating_file", "console"],
+        "uvicorn.error": ["rotating_file", "console"],
+        "uvicorn.access": ["rotating_file"],
+    },
+    root_level="INFO",
+    logger_level="DEBUG",
+)
+
+setup_logging(
+    LOG_FILE,
+    logger_handlers={
+        "uvicorn": ["rotating_file", "console"],
+        "uvicorn.error": ["rotating_file", "console"],
+        "uvicorn.access": ["rotating_file"],
+    },
+    root_level="INFO",
+    logger_level="DEBUG",
+)
 
 # FastAPI app for plain HTTP
 app = FastAPI(
@@ -46,6 +73,11 @@ register_resources(mcp, RESOURCE_DEFINITIONS)
 
 
 # Prompts
+@log_decorator(
+    logger_name="mcp.prompt",
+    level="INFO",
+    filename=Path("mcp_prompt.log"),
+)
 @mcp.prompt(
     name="explain_conversion",
     description="Guide a learner through the math for a conversion.",
