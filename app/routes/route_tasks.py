@@ -1,7 +1,10 @@
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
+
+from app.utils.logging_helper import log_decorator
 
 from app.api.task_handler import TaskHandler
 from app.data.pydantic_objects import PLTask
@@ -12,6 +15,11 @@ task_router = Router.task_router
 
 
 @task_router.get("/get-name", response_model=PLTask)
+@log_decorator(
+    logger_name="rest.task.get_task_by_name",
+    level="INFO",
+    filename=Path("rest_get_task_by_name.log"),
+)
 def get_task_by_name(session: Annotated[Session, Depends(get_session_api)], name: str | None = None) -> PLTask:
     try:
         task = TaskHandler.get_task(session, name)
@@ -49,6 +57,11 @@ def delete_task_by_name(session: Annotated[Session, Depends(get_session_api)], n
 
 
 @task_router.post("/add")
+@log_decorator(
+    logger_name="rest.task.create_task",
+    level="INFO",
+    filename=Path("rest_create_task.log"),
+)
 def create_task(session: Annotated[Session, Depends(get_session_api)], task: PLTask = None) -> PLTask:
     try:
         task = TaskHandler.add_task_to_db(session, task)

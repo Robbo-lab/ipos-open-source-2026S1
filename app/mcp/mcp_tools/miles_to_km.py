@@ -1,8 +1,11 @@
 import math
 import time
+from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
+
+from app.utils.logging_helper import log_decorator
 
 router = APIRouter(prefix="", tags=["unit-conversion"])
 
@@ -65,6 +68,11 @@ def miles_to_kilometers_value(miles: float) -> float:
 
 
 @router.post("/miles-to-kilometers")
+@log_decorator(
+    logger_name="mcp.tool.miles_to_kilometers",
+    level="INFO",
+    filename=Path("miles_to_kilometers.log"),
+)
 # def miles_to_kilometers(miles: float):
 def miles_to_kilometers(
     body: MilestoKmRequest,
