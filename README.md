@@ -177,6 +177,30 @@ Or with just:
 just test
 ```
 
+## Logging
+
+This project now includes a shared logging helper at `app/utils/logging_helper.py`.
+The helper configures a central `logs/` directory and enables a reusable
+`@log_decorator(...)` for REST endpoints, MCP tools, prompts, and resources.
+
+By default, the shared logger writes to `logs/mcp_log_streamable_http.log`, and
+`uvicorn` logs are also captured to rotating file handlers.
+
+If you need to customize logging for a specific function, the decorator can be
+used with a `filename` argument to write logs to a separate path.
+
+## Adding Extensions
+
+```bash
+uv run pytest -v
+```
+
+Or with just:
+
+```bash
+just test
+```
+
 ## Adding Extensions
 
 Add new MCP tools here:
