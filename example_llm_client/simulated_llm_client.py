@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import os
 from typing import Any
 
@@ -9,6 +10,8 @@ from app.llm.base import BaseLLMClient, LLMRequest
 from app.llm.providers.gemini.client import GeminiClient
 from app.llm.providers.gemini.models import (
     GenerateContentRequest,
+    is_function_call_part,
+    is_text_part,
 )
 
 load_dotenv()
@@ -90,51 +93,51 @@ async def run_simple_demo(client: BaseLLMClient) -> None:
     print(f"Gemini: {response.text}")
 
 
-# async def run_mcp_demo(client: GeminiClient) -> None:
-#     """The main execution pipeline for the Gemini + MCP example."""
-#     print("\n--- Gemini MCP Simulation ---")
-#     user_query = input("User (e.g. 'what is 10 miles to km'): ")
-#
-#     # 1. Start the conversation
-#     messages, model_turn = await perform_initial_turn(client, user_query)
-#
-#     # 2. Process any tool requests
-#     for part in model_turn.parts:
-#         if is_function_call_part(part):
-#             tool_res_message = handle_manual_tool_call(part.function_call)
-#
-#             messages.extend([model_turn.model_dump(by_alias=True), tool_res_message])
-#
-#             # 3. Get the final explanation
-#             print("\n[Explaining...]")
-#             final_resp = await client.generate_content(
-#                 GenerateContentRequest(contents=messages)
-#             )
-#             final_part = final_resp.candidates[0].content.parts[0]
-#
-#             if is_text_part(final_part):
-#                 print(f"\nGemini: {final_part.text}")
-#             return
-#
-#     # If no tool was requested, just show the response
-#     if model_turn.parts and is_text_part(model_turn.parts[0]):
-#         print(f"\nGemini: {model_turn.parts[0].text}")
-#
-#
-# async def main_async() -> None:
-#     if not API_KEY:
-#         print("Error: GEMINI_API_KEY not found in .env")
-#         return
-#
-#     # Create the client - notice we type it as the base interface where appropriate
-#     gemini_client = GeminiClient(api_key=API_KEY, model_name=MODEL)
-#
-#     # Run the agnostic demo
-#     await run_simple_demo(gemini_client)
-#
-#     # Run the specific MCP demo
-#     await run_mcp_demo(gemini_client)
+async def run_mcp_demo(client: GeminiClient) -> None:
+    """The main execution pipeline for the Gemini + MCP example."""
+    print("\n--- Gemini MCP Simulation ---")
+    user_query = input("User (e.g. 'what is 10 miles to km'): ")
+
+    # 1. Start the conversation
+    messages, model_turn = await perform_initial_turn(client, user_query)
+
+    # 2. Process any tool requests
+    for part in model_turn.parts:
+        if is_function_call_part(part):
+            tool_res_message = handle_manual_tool_call(part.function_call)
+
+            messages.extend([model_turn.model_dump(by_alias=True), tool_res_message])
+
+            # 3. Get the final explanation
+            print("\n[Explaining...]")
+            final_resp = await client.generate_content(
+                GenerateContentRequest(contents=messages)
+            )
+            final_part = final_resp.candidates[0].content.parts[0]
+
+            if is_text_part(final_part):
+                print(f"\nGemini: {final_part.text}")
+            return
+
+    # If no tool was requested, just show the response
+    if model_turn.parts and is_text_part(model_turn.parts[0]):
+        print(f"\nGemini: {model_turn.parts[0].text}")
 
 
-# if __name__ == "__main__":
-#     asyncio.run(main_async())
+async def main_async() -> None:
+    if not API_KEY:
+        print("Error: GEMINI_API_KEY not found in .env")
+        return
+
+    # Create the client - notice we type it as the base interface where appropriate
+    gemini_client = GeminiClient(api_key=API_KEY, model_name=MODEL)
+
+    # Run the agnostic demo
+    await run_simple_demo(gemini_client)
+
+    # Run the specific MCP demo
+    await run_mcp_demo(gemini_client)
+
+
+if __name__ == "__main__":
+    asyncio.run(main_async())
