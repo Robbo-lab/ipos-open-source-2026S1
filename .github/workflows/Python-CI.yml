@@ -34,7 +34,7 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements-dev.txt
       - name: Lint and format
-        run: ruff check --output-format=github . && ruff format --preview .
+        run: ruff check --output-format=github . && ruff format --check .
       - name: type check
         run: ty check .
 
