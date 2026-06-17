@@ -144,7 +144,7 @@ class AnyIOModelQueue:
             if isinstance(job, FinishedJob):
                 outcome = job.outcome
                 if outcome.status == "ok":
-                    return cast(LLMResponse, outcome.root)
+                    return cast(LLMResponse, outcome.root)  # ty: ignore
                 raise ValueError(f"Job failed: {outcome.root}")
             if anyio.current_time() > deadline:
                 raise TimeoutError(f"Job {job_id} did not complete within {timeout}s")
