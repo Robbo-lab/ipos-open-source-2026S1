@@ -3,8 +3,16 @@
 from __future__ import annotations
 
 from typing import Any
+from pathlib import Path
+
+from app.utils.logging_helper import log_decorator
 
 
+@log_decorator(
+    logger_name="mcp.resource.unit_reference",
+    level="INFO",
+    filename=Path("unit_reference.log"),
+)
 def unit_reference() -> dict[str, Any]:
     """
     JSON cheatsheet of supported conversions, formulas, and sample IO.
