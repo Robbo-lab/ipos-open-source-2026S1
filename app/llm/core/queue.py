@@ -104,9 +104,10 @@ class AnyIOModelQueue:
                     continue
 
                 # Transition to processing
+                now = datetime.datetime.now()
                 processing_job = ProcessingJob(
-                    **job.model_dump(exclude={"status"}),
-                    updated_at=datetime.datetime.now(),
+                    **job.model_dump(exclude={"status", "updated_at"}),
+                    updated_at=now,
                 )
                 self._jobs[job_id] = processing_job
 
@@ -115,7 +116,7 @@ class AnyIOModelQueue:
                     result = await self.router.generate(job.request)
                     # Transition to completed
                     self._jobs[job_id] = FinishedJob(
-                        **processing_job.model_dump(exclude={"status"}),
+                        **processing_job.model_dump(exclude={"status", "updated_at"}),
                         status=JobStatus.COMPLETED,
                         outcome=Ok[LLMResponse](root=result),
                         updated_at=datetime.datetime.now(),
@@ -123,7 +124,7 @@ class AnyIOModelQueue:
                 except Exception as e:
                     # Transition to failed
                     self._jobs[job_id] = FinishedJob(
-                        **processing_job.model_dump(exclude={"status"}),
+                        **processing_job.model_dump(exclude={"status", "updated_at"}),
                         status=JobStatus.FAILED,
                         outcome=Err[str](root=str(e)),
                         updated_at=datetime.datetime.now(),
