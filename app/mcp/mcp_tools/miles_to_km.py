@@ -2,8 +2,9 @@ import math
 import time
 
 from fastapi import APIRouter, HTTPException
-from app.core.exceptions import ValidationError
 from pydantic import BaseModel, Field
+
+from app.core.exceptions import ValidationError
 from app.mcp.mcp_tools.conversion import miles_to_kilometers_converter
 
 router = APIRouter(prefix="", tags=["unit-conversion"])
@@ -30,7 +31,7 @@ class MilestoKmResponse(BaseModel):
     audited_at: float
 
 
-def miles_to_kilometers_value(miles: float) -> float:
+def miles_to_kilometers_value(miles: float | None) -> float:
     """
     Convert miles to kilometers, rejecting negative inputs.
 
@@ -56,7 +57,7 @@ def miles_to_kilometers_value(miles: float) -> float:
     if miles > MAX_TUTORIAL_MILES:
         raise ValidationError(
             "Distance is unrealistically large for this tutorial example."
-            )
+        )
 
     return miles_to_kilometers_converter(miles)
 
@@ -82,10 +83,10 @@ def miles_to_kilometers(
             operation="miles_to_kilometers",
             audited_at=time.time(),
         )
-    except ValidationError as exc: 
+    except ValidationError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    except ValueError as exc:  
-        raise HTTPException(status_code=400, detail=str(exc))  from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 TOOL_DEFINITION = [

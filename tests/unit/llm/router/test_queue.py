@@ -1,4 +1,3 @@
-import asyncio
 from typing import override
 
 import anyio
@@ -7,7 +6,13 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 from app.llm.base import LLMResponse
-from app.llm.core.queue import AnyIOModelQueue, CompletedJob, FailedJob, JobStatus, Ok, Err
+from app.llm.core.queue import (
+    AnyIOModelQueue,
+    Err,
+    FinishedJob,
+    JobStatus,
+    Ok,
+)
 from app.llm.core.router import ChatMessage, LLMRouteRequest, ModelRouter
 
 
@@ -66,11 +71,11 @@ async def test_queue_worker_success():
         job = None
         for _ in range(20):
             job = await queue.get_job(job_id)
-            if isinstance(job, CompletedJob):
+            if isinstance(job, FinishedJob) and job.status == JobStatus.COMPLETED:
                 break
             await anyio.sleep(0.1)
 
-        assert isinstance(job, CompletedJob)
+        assert isinstance(job, FinishedJob)
         assert job.status == JobStatus.COMPLETED
         assert isinstance(job.outcome, Ok)
         res = job.outcome.root
@@ -99,11 +104,11 @@ async def test_queue_worker_failure():
         job = None
         for _ in range(20):
             job = await queue.get_job(job_id)
-            if isinstance(job, FailedJob):
+            if isinstance(job, FinishedJob) and job.status == JobStatus.FAILED:
                 break
             await anyio.sleep(0.1)
 
-        assert isinstance(job, FailedJob)
+        assert isinstance(job, FinishedJob)
         assert job.status == JobStatus.FAILED
         assert isinstance(job.outcome, Err)
         err_msg = job.outcome.root

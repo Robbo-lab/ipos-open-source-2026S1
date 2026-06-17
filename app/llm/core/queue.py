@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from enum import StrEnum
-from typing import Literal, Union
+from typing import Literal
 
 import anyio
 from pydantic import BaseModel, Field
@@ -18,6 +18,7 @@ class JobStatus(StrEnum):
     PROCESSING = "processing"
     COMPLETED = "completed"
     FAILED = "failed"
+
 
 class BaseJob(BaseModel):
     """Common fields for all Job states."""
@@ -127,6 +128,26 @@ class AnyIOModelQueue:
                         outcome=Err[str](root=str(e)),
                         updated_at=datetime.datetime.now(),
                     )
+
+    async def wait_for_result(
+        self, job_id: str, poll_interval: float = 0.1, timeout: float = 10
+    ) -> LLMResponse:
+        """Wait for a job to complete and return the result.
+
+        Polls the job store until the job reaches a terminal state.
+        Raises ValueError if the job fails or times out.
+        """
+        deadline = anyio.current_time() + timeout
+        while True:
+            job = self._jobs.get(job_id)
+            if isinstance(job, FinishedJob):
+                outcome = job.outcome
+                if outcome.status == "ok":
+                    return outcome.root
+                raise ValueError(f"Job failed: {outcome.root}")
+            if anyio.current_time() > deadline:
+                raise TimeoutError(f"Job {job_id} did not complete within {timeout}s")
+            await anyio.sleep(poll_interval)
 
     async def close(self):
         """Close the streams to stop the workers."""
