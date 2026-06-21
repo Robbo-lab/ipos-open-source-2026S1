@@ -2,11 +2,18 @@ from __future__ import annotations
 
 import json
 from collections.abc import AsyncGenerator
+from typing import Any
 
 import httpx
 from httpx_sse import aconnect_sse
 
-from app.llm.base import BaseLLMClient, LLMProviderError, LLMRequest, LLMResponse
+from app.llm.base import (
+    BaseLLMClient,
+    LLMProviderError,
+    LLMRequest,
+    LLMResponse,
+    StreamingLLMClient,
+)
 from app.llm.providers.gemini.models import (
     Content,
     GenerateContentRequest,
@@ -17,7 +24,7 @@ from app.llm.providers.gemini.models import (
 )
 
 
-class GeminiClient(BaseLLMClient):
+class GeminiClient(StreamingLLMClient, BaseLLMClient):
     """An asynchronous client for the Gemini API, implementing the BaseLLMClient interface."""
 
     def __init__(
@@ -43,23 +50,39 @@ class GeminiClient(BaseLLMClient):
         """The human-readable name of the provider."""
         return "Google Gemini"
 
-    def _build_url(self, method: str) -> str:
+    def _build_url(self, method: str, model_override: str | None = None) -> str:
         """Construct the REST URL for a specific model method."""
+        model = model_override or self.model_name
         # Note: We append the API key here, but avoid logging the full URL in case of error
-        return f"{self.base_url}/models/{self.model_name}:{method}?key={self.api_key}"
+        return f"{self.base_url}/models/{model}:{method}?key={self.api_key}"
+
+    @staticmethod
+    def _map_messages_to_contents(messages: list[dict[str, Any]]) -> list[Content]:
+        """Map generic OpenAI-style messages to Gemini Content objects."""
+        contents = []
+        for msg in messages:
+            role = Role.USER if msg.get("role") == "user" else Role.MODEL
+            content = Content(role=role, parts=[TextPart(text=msg.get("content", ""))])
+            contents.append(content)
+        return contents
 
     async def generate(self, request: LLMRequest) -> LLMResponse:
         """
         Implementation of the BaseLLMClient interface.
         Translates a generic LLMRequest into a Gemini-specific request.
         """
+        if request.messages:
+            contents = self._map_messages_to_contents(request.messages)
+        else:
+            contents = [Content(role=Role.USER, parts=[TextPart(text=request.prompt)])]
+
         # Convert generic prompt to Gemini Content
-        gemini_request = GenerateContentRequest(
-            contents=[Content(role=Role.USER, parts=[TextPart(text=request.prompt)])]
-        )
+        gemini_request = GenerateContentRequest(contents=contents)
 
         try:
-            response = await self.generate_content(gemini_request)
+            response = await self.generate_content(
+                gemini_request, model_override=request.model
+            )
 
             # Extract text from the first candidate
             if not response.candidates:
@@ -82,12 +105,17 @@ class GeminiClient(BaseLLMClient):
         Implementation of the StreamingLLMClient interface.
         Translates a generic LLMRequest into a Gemini-specific streaming request.
         """
-        gemini_request = GenerateContentRequest(
-            contents=[Content(role=Role.USER, parts=[TextPart(text=request.prompt)])]
-        )
+        if request.messages:
+            contents = self._map_messages_to_contents(request.messages)
+        else:
+            contents = [Content(role=Role.USER, parts=[TextPart(text=request.prompt)])]
+
+        gemini_request = GenerateContentRequest(contents=contents)
 
         try:
-            async for chunk in self.stream_generate_content(gemini_request):
+            async for chunk in self.stream_generate_content(
+                gemini_request, model_override=request.model
+            ):
                 if not chunk.candidates:
                     continue
 
@@ -108,9 +136,10 @@ class GeminiClient(BaseLLMClient):
         self,
         request: GenerateContentRequest,
         client: httpx.AsyncClient | None = None,
+        model_override: str | None = None,
     ) -> GenerateContentResponse:
         """Gemini-specific method for single content generation."""
-        url = self._build_url("generateContent")
+        url = self._build_url("generateContent", model_override=model_override)
         payload = request.model_dump(by_alias=True, exclude_none=True)
 
         if client:
@@ -127,9 +156,13 @@ class GeminiClient(BaseLLMClient):
         self,
         request: GenerateContentRequest,
         client: httpx.AsyncClient | None = None,
+        model_override: str | None = None,
     ) -> AsyncGenerator[GenerateContentResponse]:
         """Gemini-specific method for streaming content generation."""
-        url = self._build_url("streamGenerateContent") + "&alt=sse"
+        url = (
+            self._build_url("streamGenerateContent", model_override=model_override)
+            + "&alt=sse"
+        )
         payload = request.model_dump(by_alias=True, exclude_none=True)
 
         managed_client = client is None

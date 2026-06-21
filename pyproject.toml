@@ -10,17 +10,17 @@ authors = [{ name = "John Robertson", email = "john@myjamjar.com.au" }]
 license = { text = "MIT" }
 keywords = ["task", "management", "cli", "reusable", "components"]
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.13"
 
 dependencies = [
   # Server dependencies
   "fastapi>=0.136.1",
   "fastmcp>=3.3.0",
   "httpx>=0.28.1",
+  "anyio>=4.13.0",
   # Utility lib's
   "click>=8.0",
   "pydantic>=2.13.4",
-  "result-pattern>=0.2.2",
   "python-dateutil>=2.8",
   "sqlalchemy>=2.0.50",
 ]

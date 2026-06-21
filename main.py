@@ -1,17 +1,19 @@
 # Unit Converter API + MCP (tools, resources, prompts)
 # Uses FastAPI for HTTP routes and FastMCP to expose tools/resources/prompts over HTTP/SSE transports.
+from contextlib import asynccontextmanager
 
-# Create Database
-
+import anyio
+import uvicorn
 from fastapi import APIRouter, FastAPI
 from fastmcp import FastMCP
 
+from app.llm.state import queue
 from app.mcp.mcp_prompts.converter_prompts import explain_conversion_prompt
 from app.mcp.mcp_resources.converter_resources import RESOURCE_DEFINITIONS
 from app.mcp.mcp_tools.miles_to_km import router as mile_to_km
 from app.routes.router_handler import Router
-from app.utils.resource_utils import register_resources
 from app.security.rate_limit import RateLimitMiddleware
+from app.utils.resource_utils import register_resources
 
 # FastAPI app for plain HTTP
 app = FastAPI(
@@ -61,8 +63,27 @@ def _prompt_explain_conversion(input_value: str, input_unit: str, target_unit: s
 # Build MCP sub-application and mount onto FastAPI
 mcp_http_app = mcp.http_app(path="/", transport="streamable-http")
 
-# Ensure FastAPI runs the MCP lifespan so streamable-http initialises properly
-app.router.lifespan_context = mcp_http_app.lifespan
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manages the combined lifespan of MCP and the AnyIO background worker pool."""
+    print("Starting AnyIO Model Queue workers...")
+    async with anyio.create_task_group() as tg:
+        # Start the background worker pool
+        tg.start_soon(queue.run_worker_pool)
+
+        # Start the MCP lifespan
+        async with mcp_http_app.lifespan(app):
+            yield
+
+        # Clean shutdown
+        print("Shutting down AnyIO Model Queue...")
+        await queue.close()
+        tg.cancel_scope.cancel()
+
+
+# Ensure FastAPI runs our combined lifespan
+app.router.lifespan_context = lifespan
 
 app.mount("/mcp", mcp_http_app)
 

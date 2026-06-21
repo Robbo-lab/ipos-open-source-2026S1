@@ -37,7 +37,7 @@ example_llm_client/       # Example Gemini / LLM client
 
 ## Prerequisites
 
-- Python 3.14+
+- Python 3.13
 - Virtual environment.
 - npm inspector below.
 
@@ -130,8 +130,8 @@ The API includes rate limiting middleware for HTTP and MCP endpoints.
 1. Start the server as above.
 2. Point your MCP client to the process.
 
+Example VS Code .vscode/mcp.json entry:
 ```json
-// Example VS Code .vscode/mcp.json entry:
 {
   "servers": {
     "UnitConverter": {

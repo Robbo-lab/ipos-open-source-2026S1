@@ -1,3 +1,5 @@
+# SPECIFICATION
+
 ## 1. Project Purpose
 
 Build a **Task Management System** that:
@@ -183,12 +185,13 @@ The MCP layer must include Gemini support.
 
 ## 10. Gemini Integration (Required)
 
-Gemini is required in v1 and must follow these rules:
+Gemini is the primary LLM for v1. While the system now supports a unified multi-provider interface (see Section 21), Gemini remains a core requirement and must be supported in both MCP and direct REST contexts.
 
-- Used only inside MCP
-- Never talks directly to services or storage
-- Provides suggestions only
-- Output must be structured and checked before use
+- Available via both MCP tools and direct REST API routes.
+- Never talks directly to services or storage.
+- Provides suggestions only.
+- Output must be structured and checked before use.
+
 
 ---
 
@@ -326,13 +329,22 @@ All task decisions belong to the Service Layer.
 
 ---
 
-## 20. Summary
+---
 
-This specification defines a **clear, strict system design** with:
+## 21. Unified LLM Interface
 
-- One place for all logic
-- Required Gemini integration
-- Clean separation of responsibilities
-- Strong support for learning and extension
+The system has evolved to support a unified, provider-agnostic LLM interface.
 
-All implementations must follow **Section 3: Canonical System Architecture**.
+### Rules
+
+- LLM logic is exposed via REST endpoints (`/v1/llm/*`)
+- Supports multiple providers (Gemini, OpenAI, etc.)
+- Use `AnyIOModelQueue` for background tasks
+- Use `LLMClient` for all LLM interactions
+
+### Improvements
+
+- Works independently of MCP
+- Non-blocking task execution
+- Type-safe results
+- Decoupled provider logic
