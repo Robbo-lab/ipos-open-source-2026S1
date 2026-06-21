@@ -41,7 +41,7 @@ Examples of tool names
 
 | Intended Behaviour          | MCP Tool Name         |
 | --------------------------- | --------------------- |
-| Convert miles to kilometers | `convert_miles_to_km` |
+| Convert miles to kilometers | `convert_miles_to_kilometers` |
 | Convert km to miles         | `convert_km_to_miles` |
 | Calculate distance          | `calculate_distance`  |
 | Get task by id              | `get_task_by_id`      |
