@@ -89,19 +89,27 @@ def parse_mcp_response(response: httpx.Response) -> dict:
 
 
 @pytest.fixture
-def mcp_client(http_client, mcp_url, mcp_headers, protocol_version):
-    client = MCPTestClient(http_client, mcp_url, mcp_headers)
+def build_mcp_test_client(http_client, mcp_url, mcp_headers, protocol_version):
+    def builder(**kwargs):
+        client = MCPTestClient(http_client, mcp_url, mcp_headers)
 
-    init_response = client.rpc(
-        "initialize",
-        {
-            "protocolVersion": protocol_version,
-            "capabilities": {},
-            "clientInfo": {"name": "pytest", "version": "1.0"},
-        },
-        rpc_id=0,
-    )
-    assert init_response.status_code in {200, 202}
+        init_response = client.rpc(
+            "initialize",
+            {
+                "protocolVersion": protocol_version,
+                "capabilities": kwargs.get("capabilities", {}),
+                "clientInfo": kwargs.get("clientInfo", {"name": "pytest", "version": "1.0"}),
+            },
+            rpc_id=0,
+        )
+        assert init_response.status_code in {200, 202}
 
-    client.notification("notifications/initialized")
-    return client
+        client.notification("notifications/initialized")
+        return client
+
+    return builder
+
+
+@pytest.fixture
+def mcp_client(build_mcp_test_client):
+    return build_mcp_test_client()
