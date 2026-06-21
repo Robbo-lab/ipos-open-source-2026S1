@@ -62,7 +62,7 @@ def miles_to_kilometers_value(miles: float | None) -> float:
     return miles_to_kilometers_converter(miles)
 
 
-@router.post("/miles-to-kilometers")
+@router.post("/convert-miles-to-kilometers")
 # def miles_to_kilometers(miles: float):
 def miles_to_kilometers(
     body: MilestoKmRequest,
