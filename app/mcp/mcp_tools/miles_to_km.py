@@ -81,7 +81,7 @@ def miles_to_kilometers(
         result = miles_to_kilometers_value(body.miles)
         return MilestoKmResponse(
             result=result,
-            operation="miles_to_kilometers",
+            operation="convert_miles_to_kilometers",
             audited_at=time.time(),
         )
     except ValidationError as exc:
@@ -92,7 +92,7 @@ def miles_to_kilometers(
 
 TOOL_DEFINITION = [
     {
-        "name": "miles_to_kilometers",
+        "name": "convert_miles_to_kilometers",
         "description": "Convert miles to kilometers (validates non-negative input)",
         "func": miles_to_kilometers_value,
         "tags": {"distance", "conversion"},
