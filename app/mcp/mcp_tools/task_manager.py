@@ -148,7 +148,7 @@ class ListTasksOutput(BaseModel):
 def create_task_tool(
     session: Annotated[Session, Depends(get_session_api)],
     principal: Principal,
-    body: CreateTaskInput = None,
+    body: CreateTaskInput,
 ) -> CreateTaskOutput:
     """Create a new task in the task manager.
 
@@ -190,7 +190,7 @@ def create_task_tool(
 def delete_task_tool(
     session: Annotated[Session, Depends(get_session_api)],
     principal: Principal,
-    body: DeleteTaskByNameInput = None,
+    body: DeleteTaskByNameInput,
 ) -> DeleteTaskByNameOutput:
     """Delete an existing task by its name.
 
@@ -216,7 +216,7 @@ def delete_task_tool(
 def get_task_by_name_tool(
     session: Annotated[Session, Depends(get_session_api)],
     principal: Principal,
-    body: GetTaskByNameInput = None,
+    body: GetTaskByNameInput,
 ) -> GetTaskOutput:
     """Retrieve a task by its name.
 
@@ -258,7 +258,7 @@ def get_task_by_name_tool(
 def get_task_by_id_tool(
     session: Annotated[Session, Depends(get_session_api)],
     principal: Principal,
-    body: GetTaskByIdInput = None,
+    body: GetTaskByIdInput,
 ) -> GetTaskOutput:
     """Retrieve a task by its ID.
 
@@ -286,13 +286,13 @@ def get_task_by_id_tool(
     if task is None:
         return GetTaskOutput(
             success=False,
-            message=f"Task '{body.name}' was not found",
+            message=f"Task '{body.id}' was not found",
             task=task,
         )
 
     return GetTaskOutput(
         success=True,
-        message=f"Task '{body.name}' was completed",
+        message=f"Task '{body.id}' was completed",
         task=task,
     )
 
@@ -300,7 +300,7 @@ def get_task_by_id_tool(
 def list_tasks_tool(
     session: Annotated[Session, Depends(get_session_api)],
     principal: Principal,
-    body: ListTasksInput = None,
+    body: ListTasksInput,
 ) -> ListTasksOutput:
     """Retrieve a list of tasks filtered by status.
 
@@ -338,7 +338,7 @@ def list_tasks_tool(
 def complete_task_tool(
     session: Annotated[Session, Depends(get_session_api)],
     principal: Principal,
-    body: CompleteTaskInput = None,
+    body: CompleteTaskInput,
 ) -> GetTaskOutput:
     """Mark an existing task as completed.
 
