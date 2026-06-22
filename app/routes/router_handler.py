@@ -24,8 +24,9 @@ class Router:
                     if Path(file_path).name.startswith("route_"):
                         module_name = Path(file_path).stem
                         spec = spec_from_file_location(module_name, file_path)
-                        module = module_from_spec(spec)
-                        spec.loader.exec_module(module)
+                        if spec and spec.loader:
+                            module = module_from_spec(spec)
+                            spec.loader.exec_module(module)
 
                 except (UnicodeDecodeError, PermissionError):
                     continue

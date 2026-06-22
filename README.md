@@ -37,7 +37,7 @@ example_llm_client/       # Example Gemini / LLM client
 
 ## Prerequisites
 
-- Python 3.14+
+- Python 3.13
 - Virtual environment.
 - npm inspector below.
 
@@ -99,6 +99,8 @@ MCP endpoints served by FastMCP:
 
 - streamable-http: http://localhost:8003/mcp
 
+
+
 Each endpoint returns JSON like:
 
 - { "result": <number>, "operation": "..." } or { "error": "..." } for invalid input.
@@ -114,13 +116,22 @@ Each endpoint returns JSON like:
 
 Our server doesn't require auth yet, we can omit the **Authorization** header.
 
+## Rate Limiting
+
+The API includes rate limiting middleware for HTTP and MCP endpoints.
+
+- Limit: 50 requests per client IP every 3600 seconds.
+- Storage: request timestamps are tracked in memory and expired records are cleared.
+- Exceeded limit: returns `429 Too Many Requests` with a `Retry-After` header.
+- Missing client IP: returns `400 Bad Request`.
+
 ## Use with MCP (VS Code Example)
 
 1. Start the server as above.
 2. Point your MCP client to the process.
 
+Example VS Code .vscode/mcp.json entry:
 ```json
-// Example VS Code .vscode/mcp.json entry:
 {
   "servers": {
     "UnitConverter": {

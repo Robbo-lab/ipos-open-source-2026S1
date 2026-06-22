@@ -16,6 +16,8 @@ def get_task_by_name(
     session: Annotated[Session, Depends(get_session_api)], name: str | None = None
 ) -> PLTask:
     try:
+        if name is None:
+            raise HTTPException(status_code=400, detail="name is required")
         task = TaskHandler.get_task(session, name)
     except Exception as e:
         raise e
@@ -33,6 +35,8 @@ def get_task_by_id(
     session: Annotated[Session, Depends(get_session_api)], task_id: int | None = None
 ) -> PLTask:
     try:
+        if task_id is None:
+            raise HTTPException(status_code=400, detail="task_id is required")
         task = TaskHandler.get_task(session, task_id)
     except Exception as e:
         raise e
@@ -49,14 +53,18 @@ def get_task_by_id(
 def delete_task_by_name(
     session: Annotated[Session, Depends(get_session_api)], name: str | None = None
 ):
+    if name is None:
+        raise HTTPException(status_code=400, detail="name is required")
     TaskHandler.delete_task(session, name)
 
 
 @task_router.post("/add")
 def create_task(
-    session: Annotated[Session, Depends(get_session_api)], task: PLTask = None
+    session: Annotated[Session, Depends(get_session_api)], task: PLTask | None = None
 ) -> PLTask:
     try:
+        if task is None:
+            raise HTTPException(status_code=400, detail="task is required")
         task = TaskHandler.add_task_to_db(session, task)
     except Exception as e:
         raise e
@@ -74,5 +82,7 @@ def filter_task_by_type(
 def complete_task(
     session: Annotated[Session, Depends(get_session_api)], name: str | None = None
 ) -> PLTask:
+    if name is None:
+        raise HTTPException(status_code=400, detail="name is required")
     task = TaskHandler.get_task(session, name)
     return TaskHandler.complete_task(session, task)

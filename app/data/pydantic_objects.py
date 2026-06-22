@@ -5,6 +5,8 @@ from pydantic import BaseModel
 
 # PLTask stands for Pydantic Task
 class PLTask(BaseModel):
+    model_config = {"from_attributes": True}
+
     id: int | None = None
     name: str | None = None
     type: str | None = None

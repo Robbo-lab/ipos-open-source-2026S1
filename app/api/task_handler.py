@@ -33,7 +33,7 @@ class TaskHandler:
     @classmethod
     def add_task_to_db(cls, db: Session, task: PLTask):
         """Creates a task and adds it to the misc."""
-        print(db)
+        # print(db) # debug print
         new_task_obj = DBTask(
             id=task.id or None,
             name=task.name,
@@ -55,13 +55,12 @@ class TaskHandler:
     # Deletes a task based on int or str inputted
     @classmethod
     def delete_task(cls, db: Session, name_or_id: int | str):
-        if type(name_or_id) is int:
+        if isinstance(name_or_id, int):
             task = DataBaseMethods.get_object_by_id(db, DBTask, name_or_id)
-        elif type(name_or_id) is str:
+        elif isinstance(name_or_id, str):
             task = DataBaseMethods.get_object_by_name(db, DBTask, name_or_id)
         else:
-            task = None
-            raise Exception("name_or_id must be either a name or a id")
+            raise TypeError("name_or_id must be either a name or an id")
 
         if task:
             DataBaseMethods.delete_object(db, task)
@@ -107,6 +106,8 @@ class TaskHandler:
         task.completed = True
         task.task_ended = datetime.now()
 
+        if task.id is None:
+            raise HTTPException(status_code=400, detail="task id is required")
         dbtask = DataBaseMethods.get_object_by_id(db, DBTask, task.id)
 
         if dbtask:
@@ -130,11 +131,4 @@ class TaskHandler:
 
     @classmethod
     def __from_db_to_pl(cls, dbtask: DBTask):
-        return PLTask(
-            id=dbtask.id,
-            name=dbtask.name,
-            type=dbtask.type,
-            description=dbtask.description,
-            completed=dbtask.completed,
-            task_started=dbtask.task_started,
-        )
+        return PLTask.model_validate(dbtask)
