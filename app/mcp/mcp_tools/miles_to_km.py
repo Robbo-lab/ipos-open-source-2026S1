@@ -10,15 +10,23 @@ from app.mcp.mcp_tools.conversion import miles_to_kilometers_converter
 router = APIRouter(prefix="", tags=["unit-conversion"])
 
 MAX_TUTORIAL_MILES = 100_000
+MIN_TUTORIAL_MILES = 0.0001
 
 
 # --- Request/Response models for clarity ---
 class MilestoKmRequest(BaseModel):
     """Request model for miles to kilometers conversion, with validation.
-    Attributes: ge=0 ensures non-negative input, and description provides API documentation.
+
+    Attributes: miles must be within the same supported range as the runtime
+    converter.
     """
 
-    miles: float = Field(..., ge=0, description="Distance in miles (>= 0)")
+    miles: float = Field(
+        ...,
+        ge=MIN_TUTORIAL_MILES,
+        le=MAX_TUTORIAL_MILES,
+        description="Distance in miles (0.0001 to 100000)",
+    )
 
 
 class MilestoKmResponse(BaseModel):
@@ -33,7 +41,7 @@ class MilestoKmResponse(BaseModel):
 
 def miles_to_kilometers_value(miles: float | None) -> float:
     """
-    Convert miles to kilometers, rejecting negative inputs.
+    Convert miles to kilometers, rejecting unsupported inputs.
 
     Args:
         miles: Distance in miles.
@@ -42,7 +50,7 @@ def miles_to_kilometers_value(miles: float | None) -> float:
         The distance in kilometers.
 
     Raises:
-        ValueError: If a negative distance is provided.
+        ValidationError: If distance is missing, non-finite, or out of range.
     """
     if miles is None:
         raise ValidationError("Miles is required.")
@@ -52,7 +60,7 @@ def miles_to_kilometers_value(miles: float | None) -> float:
         raise ValidationError("Miles must be a finite number.")
     if miles <= 0:
         raise ValidationError("Distance must be greater than zero.")
-    if miles < 0.0001:  # noqa: PLR2004
+    if miles < MIN_TUTORIAL_MILES:
         raise ValidationError("Distance is too small to be meaningful.")
     if miles > MAX_TUTORIAL_MILES:
         raise ValidationError(
@@ -92,7 +100,7 @@ def miles_to_kilometers(
 TOOL_DEFINITION = [
     {
         "name": "miles_to_kilometers",
-        "description": "Convert miles to kilometers (validates non-negative input)",
+        "description": "Convert miles to kilometers (validates supported range)",
         "func": miles_to_kilometers_value,
         "tags": {"distance", "conversion"},
     },

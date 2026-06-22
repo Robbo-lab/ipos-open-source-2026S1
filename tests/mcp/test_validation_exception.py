@@ -1,7 +1,13 @@
 import pytest
+from pydantic import ValidationError as PydanticValidationError
 
 from app.core.exceptions import ValidationError
-from app.mcp.mcp_tools.miles_to_km import miles_to_kilometers_value
+from app.mcp.mcp_tools.miles_to_km import (
+    MAX_TUTORIAL_MILES,
+    MIN_TUTORIAL_MILES,
+    MilestoKmRequest,
+    miles_to_kilometers_value,
+)
 
 EXPECTED_KM = 1.609
 CONVERSION_TOLERANCE = 0.001
@@ -24,6 +30,28 @@ def test_negative_miles_raises_validation_error():
 def test_zero_miles_raises_validation_error():
     with pytest.raises(ValidationError):
         miles_to_kilometers_value(0)
+
+
+def test_request_model_rejects_zero_miles():
+    with pytest.raises(PydanticValidationError):
+        MilestoKmRequest(miles=0)
+
+
+def test_request_model_rejects_too_small_miles():
+    with pytest.raises(PydanticValidationError):
+        MilestoKmRequest(miles=MIN_TUTORIAL_MILES / 10)
+
+
+def test_request_model_rejects_too_large_miles():
+    with pytest.raises(PydanticValidationError):
+        MilestoKmRequest(miles=MAX_TUTORIAL_MILES + 1)
+
+
+def test_request_model_accepts_runtime_boundary_miles():
+    assert MilestoKmRequest(miles=MIN_TUTORIAL_MILES).miles == pytest.approx(
+        MIN_TUTORIAL_MILES
+    )
+    assert MilestoKmRequest(miles=MAX_TUTORIAL_MILES).miles == MAX_TUTORIAL_MILES
 
 
 def test_none_miles_raises_validation_error():
