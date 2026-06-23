@@ -5,6 +5,6 @@ def test_server_health(base_url, http_client):
     body = response.json()
     print(f"[test_server_health] status_code={response.status_code}")
     print(f"[test_server_health] body={body}")
-    assert body["status"] == "ok"
-    assert "python" in body
-    assert "uptime_seconds" in body
+    assert body["data"]["status"] == "ok"
+    assert "python" in body["data"]
+    assert "uptime_seconds" in body["data"]

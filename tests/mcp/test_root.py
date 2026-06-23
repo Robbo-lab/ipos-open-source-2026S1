@@ -10,8 +10,8 @@ def test_root(base_url, http_client):
     body = response.json()
     print(f"[test_root] status_code={response.status_code}")
     print(f"[test_root] body={body}")
-    assert body["status"] == "ok"
-    assert body["service"] == "unit-converter-mcp-server"
-    assert "docs" in body
-    assert "health" in body
-    assert "mcp" in body
+    assert body["data"]["status"] == "ok"
+    assert body["data"]["service"] == "unit-converter-mcp-server"
+    assert "docs" in body["data"]
+    assert "health" in body["data"]
+    assert "mcp" in body["data"]

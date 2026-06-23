@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from enum import StrEnum
-from typing import Literal, cast
+from typing import Literal
 
 import anyio
 from pydantic import BaseModel, Field
@@ -143,8 +143,14 @@ class AnyIOModelQueue:
             job = self._jobs.get(job_id)
             if isinstance(job, FinishedJob):
                 outcome = job.outcome
+
                 if outcome.status == "ok":
-                    return cast(LLMResponse, outcome.root)  # ty: ignore
+                    if not isinstance(outcome.root, LLMResponse):
+                        raise TypeError(
+                            f"Expected LLMResponse, got {type(outcome.root).__name__}"
+                        )
+                    return outcome.root
+
                 raise ValueError(f"Job failed: {outcome.root}")
             if anyio.current_time() > deadline:
                 raise TimeoutError(f"Job {job_id} did not complete within {timeout}s")

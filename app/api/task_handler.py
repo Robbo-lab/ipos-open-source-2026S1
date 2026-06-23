@@ -48,7 +48,7 @@ class TaskHandler:
         if not new_task_obj:
             raise Exception("No new task obj")
 
-        task.id = new_task_obj.id
+        task.id = new_task_obj.id  # ty: ignore
 
         return task
 
@@ -112,8 +112,8 @@ class TaskHandler:
 
         if dbtask:
             try:
-                dbtask.completed = True
-                dbtask.task_ended = task.task_ended
+                dbtask.completed = True  # ty: ignore
+                dbtask.task_ended = task.task_ended  # ty: ignore
 
                 db.commit()
                 return task

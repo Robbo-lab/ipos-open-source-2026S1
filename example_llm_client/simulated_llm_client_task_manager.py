@@ -259,7 +259,9 @@ async def run_mcp_demo(client: GeminiClient) -> None:
             # 3. Get the final explanation
             print("\n[Explaining...]")
             final_resp = await client.generate_content(
-                GenerateContentRequest(contents=messages, tools=cast(Any,get_available_tools()))
+                GenerateContentRequest(
+                    contents=messages, tools=cast(Any, get_available_tools())
+                )
             )
             final_part = final_resp.candidates[0].content.parts[0]
 

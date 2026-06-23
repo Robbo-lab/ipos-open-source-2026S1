@@ -43,7 +43,7 @@ class BaseLLMClient(Protocol):
 
     @property
     def provider_name(self) -> str:
-        """Returns the human-readable name of the LLM provider."""
+        """Human-readable name of the LLM provider."""
         ...
 
     async def generate(self, request: LLMRequest) -> LLMResponse:
