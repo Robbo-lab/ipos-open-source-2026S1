@@ -209,6 +209,10 @@ Add or update example LLM client code here:
 example_llm_client/
 ```
 
+### Adding New MCP Tools
+
+For details on MCP tools, see [mcp-tools-naming-guide.md](org/mcp-tools-naming-guide.md).
+
 ## Contributing
 
 For detailed contribution guidelines, see [CONTRIBUTION.md](CONTRIBUTION.md).

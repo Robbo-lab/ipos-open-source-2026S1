@@ -62,7 +62,7 @@ def miles_to_kilometers_value(miles: float | None) -> float:
     return miles_to_kilometers_converter(miles)
 
 
-@router.post("/miles-to-kilometers")
+@router.post("/convert-miles-to-kilometers", operation_id="convert_miles_to_kilometers")
 # def miles_to_kilometers(miles: float):
 def miles_to_kilometers(
     body: MilestoKmRequest,
@@ -80,7 +80,7 @@ def miles_to_kilometers(
         result = miles_to_kilometers_value(body.miles)
         return MilestoKmResponse(
             result=result,
-            operation="miles_to_kilometers",
+            operation="convert_miles_to_kilometers",
             audited_at=time.time(),
         )
     except ValidationError as exc:
@@ -91,7 +91,7 @@ def miles_to_kilometers(
 
 TOOL_DEFINITION = [
     {
-        "name": "miles_to_kilometers",
+        "name": "convert_miles_to_kilometers",
         "description": "Convert miles to kilometers (validates non-negative input)",
         "func": miles_to_kilometers_value,
         "tags": {"distance", "conversion"},
