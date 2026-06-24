@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.utils.resource_definition import ResourceDefinition
+
 
 def unit_reference() -> dict[str, Any]:
     """
@@ -29,13 +31,12 @@ def unit_reference() -> dict[str, Any]:
     }
 
 
-# How would we scope this?
 RESOURCE_DEFINITIONS = [
-    {
-        "name": "unit_reference",
-        "display_name": "Unit Converter Cheatsheet",
-        "description": "JSON cheatsheet covering formulas and sample conversions.",
-        "mime_type": "application/json",
-        "func": unit_reference,
-    },
+    ResourceDefinition(
+        name="unit_reference",
+        display_name="Unit Converter Cheatsheet",
+        description="JSON cheatsheet covering formulas and sample conversions.",
+        mime_type="application/json",
+        func=unit_reference,
+    ),
 ]

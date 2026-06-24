@@ -18,6 +18,8 @@ class LLMRequest:
     """Provider-agnostic request model."""
 
     prompt: str
+    messages: list[dict[str, Any]] = field(default_factory=list)
+    model: str | None = None
     extra: dict[str, Any] = field(default_factory=dict)
 
 
@@ -41,7 +43,7 @@ class BaseLLMClient(Protocol):
 
     @property
     def provider_name(self) -> str:
-        """Returns the human-readable name of the LLM provider."""
+        """Human-readable name of the LLM provider."""
         ...
 
     async def generate(self, request: LLMRequest) -> LLMResponse:

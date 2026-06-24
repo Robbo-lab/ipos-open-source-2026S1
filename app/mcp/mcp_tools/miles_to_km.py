@@ -4,6 +4,9 @@ import time
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
+from app.core.exceptions import ValidationError
+from app.mcp.mcp_tools.conversion import miles_to_kilometers_converter
+
 router = APIRouter(prefix="", tags=["unit-conversion"])
 
 MAX_TUTORIAL_MILES = 100_000
@@ -28,7 +31,7 @@ class MilestoKmResponse(BaseModel):
     audited_at: float
 
 
-def miles_to_kilometers_value(miles: float) -> float:
+def miles_to_kilometers_value(miles: float | None) -> float:
     """
     Convert miles to kilometers, rejecting negative inputs.
 
@@ -42,29 +45,24 @@ def miles_to_kilometers_value(miles: float) -> float:
         ValueError: If a negative distance is provided.
     """
     if miles is None:
-        raise HTTPException(status_code=422, detail="Miles is required.")
+        raise ValidationError("Miles is required.")
     if not isinstance(miles, (int, float)):
-        raise HTTPException(status_code=422, detail="Miles must be a numeric value.")
+        raise ValidationError("Miles must be a numeric value.")
     if math.isnan(miles) or math.isinf(miles):
-        raise HTTPException(status_code=422, detail="Miles must be a finite number.")
+        raise ValidationError("Miles must be a finite number.")
     if miles <= 0:
-        raise HTTPException(
-            status_code=422, detail="Distance must be greater than zero."
-        )
+        raise ValidationError("Distance must be greater than zero.")
     if miles < 0.0001:  # noqa: PLR2004
-        raise HTTPException(
-            status_code=422, detail="Distance is too small to be meaningful."
-        )
+        raise ValidationError("Distance is too small to be meaningful.")
     if miles > MAX_TUTORIAL_MILES:
-        raise HTTPException(
-            status_code=422,
-            detail="Distance is unrealistically large for this tutorial example.",
+        raise ValidationError(
+            "Distance is unrealistically large for this tutorial example."
         )
 
-    return miles / 0.621371
+    return miles_to_kilometers_converter(miles)
 
 
-@router.post("/miles-to-kilometers")
+@router.post("/convert-miles-to-kilometers", operation_id="convert_miles_to_kilometers")
 # def miles_to_kilometers(miles: float):
 def miles_to_kilometers(
     body: MilestoKmRequest,
@@ -82,16 +80,18 @@ def miles_to_kilometers(
         result = miles_to_kilometers_value(body.miles)
         return MilestoKmResponse(
             result=result,
-            operation="miles_to_kilometers",
+            operation="convert_miles_to_kilometers",
             audited_at=time.time(),
         )
-    except ValueError as exc:  # Keep HTTP response friendly
-        raise HTTPException(status_code=400, detail=str(exc))  # noqa: B904
+    except ValidationError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 TOOL_DEFINITION = [
     {
-        "name": "miles_to_kilometers",
+        "name": "convert_miles_to_kilometers",
         "description": "Convert miles to kilometers (validates non-negative input)",
         "func": miles_to_kilometers_value,
         "tags": {"distance", "conversion"},

@@ -15,7 +15,6 @@ from starlette.status import (
 from app.security import rate_limit
 from app.security.rate_limit import RateLimitMiddleware
 
-
 # Keep the test limit small so the tests can trigger the rate limiter quickly.
 TEST_RATE_LIMIT_REQUESTS = 2
 TEST_RATE_LIMIT_WINDOW_SECONDS = 60
@@ -38,16 +37,10 @@ def test_rate_limit_blocks_after_limit(monkeypatch):
 
     # The real limit is higher, so monkeypatch lowers it for this test only.
     # Pytest restores the original values after the test finishes.
-    monkeypatch.setattr(
-        rate_limit,
-        "RATE_LIMIT_REQUESTS",
-        TEST_RATE_LIMIT_REQUESTS
-    )
+    monkeypatch.setattr(rate_limit, "RATE_LIMIT_REQUESTS", TEST_RATE_LIMIT_REQUESTS)
 
     monkeypatch.setattr(
-        rate_limit,
-        "RATE_LIMIT_WINDOW_SECONDS",
-        TEST_RATE_LIMIT_WINDOW_SECONDS
+        rate_limit, "RATE_LIMIT_WINDOW_SECONDS", TEST_RATE_LIMIT_WINDOW_SECONDS
     )
 
     # TestClient runs this small FastAPI app in the test process.

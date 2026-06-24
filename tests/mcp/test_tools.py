@@ -24,8 +24,8 @@ def test_tools_call_miles_to_km(mcp_client):
     response = mcp_client.rpc(
         "tools/call",
         {
-            "name": "miles_to_km_miles_to_km_post",
-            "arguments": {"fahrenheit": 77},
+            "name": "convert_miles_to_kilometers",
+            "arguments": {"miles": 77},
         },
         id=3,
     )

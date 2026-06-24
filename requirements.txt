@@ -8,6 +8,7 @@ annotated-types==0.7.0
     # via pydantic
 anyio==4.13.0
     # via
+    #   ipos-open-source-2026s1 (pyproject.toml)
     #   httpx
     #   mcp
     #   py-key-value-aio
@@ -162,8 +163,6 @@ referencing==0.37.0
     #   jsonschema
     #   jsonschema-path
     #   jsonschema-specifications
-result-pattern==0.2.2
-    # via ipos-open-source-2026s1 (pyproject.toml)
 rich==15.0.0
     # via
     #   cyclopts
