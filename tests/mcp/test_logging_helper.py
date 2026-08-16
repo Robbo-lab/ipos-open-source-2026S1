@@ -27,7 +27,7 @@ def test_log_decorator_writes_log_entries(tmp_path: Path) -> None:
         logger_level="INFO",
     )
 
-    @log_decorator(logger_name="custom", level="INFO", filename=log_file)
+    @log_decorator(logger_name="custom", level="INFO")
     def sample(a: int, b: int) -> int:
         return a + b
 

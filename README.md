@@ -179,15 +179,71 @@ just test
 
 ## Logging
 
-This project now includes a shared logging helper at `app/utils/logging_helper.py`.
-The helper configures a central `logs/` directory and enables a reusable
+This project includes a shared logging helper at `app/utils/logging_helper.py`.
+The helper configures a central `logs/` directory and provides a reusable
 `@log_decorator(...)` for REST endpoints, MCP tools, prompts, and resources.
 
-By default, the shared logger writes to `logs/mcp_log_streamable_http.log`, and
-`uvicorn` logs are also captured to rotating file handlers.
+### Default Configuration
 
-If you need to customize logging for a specific function, the decorator can be
-used with a `filename` argument to write logs to a separate path.
+By default, the shared logger writes to `logs/mcp_log_streamable_http.log`, and
+`uvicorn` logs are also captured to rotating file handlers with the following defaults:
+- **Log Level**: INFO (root) / DEBUG (per-logger)
+- **Log Format**: `%(asctime)s [%(levelname)s] %(name)s: %(message)s`
+- **Max File Size**: 10 MB per file
+- **Backup Count**: 5 rotating files
+
+### Customizing Log File Location
+
+To change the log file name or location, modify the `setup_logging()` call in `main.py`:
+
+```python
+from app.utils.logging_helper import setup_logging
+
+# Change log file location
+setup_logging(
+    log_file="logs/my_custom_log.log",
+    logger_handlers={
+        "uvicorn": ["rotating_file", "console"],
+        "uvicorn.error": ["rotating_file", "console"],
+        "uvicorn.access": ["rotating_file"],
+    },
+    root_level="INFO",
+    logger_level="DEBUG",
+)
+```
+
+### Customizing Log Levels
+
+Adjust root and per-logger levels:
+
+```python
+setup_logging(
+    log_file="logs/mcp_log_streamable_http.log",
+    root_level="WARNING",      # Reduce noise at root level
+    logger_level="INFO",       # Be less verbose per logger
+)
+```
+
+### Using the Decorator
+
+Apply the `@log_decorator` to automatically log function calls and exceptions:
+
+```python
+from app.utils.logging_helper import log_decorator
+
+@log_decorator(logger_name="my_app", level="INFO")
+async def my_async_function(arg1, arg2):
+    return f"Result: {arg1} + {arg2}"
+```
+
+The decorator automatically handles both synchronous and asynchronous functions.
+
+### Advanced Configuration
+
+For full control over logging configuration, see the
+[Python logging documentation](https://docs.python.org/3/library/logging.html).
+The `build_log_config()` function returns a standard `dictConfig` dictionary
+that can be customized further before passing to `logging.config.dictConfig()`.
 
 ## Adding Extensions
 
