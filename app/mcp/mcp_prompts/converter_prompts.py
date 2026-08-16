@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from fastmcp.prompts import Message
 
 from app.utils.logging_helper import log_decorator
@@ -10,7 +8,6 @@ from app.utils.logging_helper import log_decorator
 @log_decorator(
     logger_name="mcp.prompt.explain_conversion",
     level="INFO",
-    filename=Path("explain_conversion_prompt.log"),
 )
 def explain_conversion_prompt(
     input_value: str,

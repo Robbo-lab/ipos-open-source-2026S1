@@ -76,7 +76,6 @@ register_resources(mcp, RESOURCE_DEFINITIONS)
 @log_decorator(
     logger_name="mcp.prompt",
     level="INFO",
-    filename=Path("mcp_prompt.log"),
 )
 @mcp.prompt(
     name="explain_conversion",

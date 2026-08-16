@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, HTTPException
@@ -18,7 +17,6 @@ task_router = Router.task_router
 @log_decorator(
     logger_name="rest.task.get_task_by_name",
     level="INFO",
-    filename=Path("rest_get_task_by_name.log"),
 )
 def get_task_by_name(session: Annotated[Session, Depends(get_session_api)], name: str | None = None) -> PLTask:
     try:
@@ -60,7 +58,6 @@ def delete_task_by_name(session: Annotated[Session, Depends(get_session_api)], n
 @log_decorator(
     logger_name="rest.task.create_task",
     level="INFO",
-    filename=Path("rest_create_task.log"),
 )
 def create_task(session: Annotated[Session, Depends(get_session_api)], task: PLTask = None) -> PLTask:
     try:

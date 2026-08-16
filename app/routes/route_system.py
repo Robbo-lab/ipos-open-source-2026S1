@@ -2,7 +2,6 @@ import datetime
 import os
 import platform
 import time
-from pathlib import Path
 
 from app.routes.router_handler import Router
 from app.utils.logging_helper import log_decorator
@@ -16,7 +15,6 @@ started_at = time.time()
 @log_decorator(
     logger_name="rest.system.root",
     level="INFO",
-    filename=Path("rest_root.log"),
 )
 def root():
     return {
@@ -32,7 +30,6 @@ def root():
 @log_decorator(
     logger_name="rest.system.health",
     level="INFO",
-    filename=Path("rest_health.log"),
 )
 def health():
     return {
